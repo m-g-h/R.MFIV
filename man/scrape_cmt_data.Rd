@@ -12,12 +12,11 @@ scrape_cmt_data(url = NULL)
 Also accepts links from this website with other selections than "All", see e.g. the example.}
 }
 \value{
-Returns a \code{data.table} containing the scraped CMT data:
+Returns a \code{data.table} containing the following columns:
 \itemize{
-\item \strong{Date} (\code{date}, giving the day of the observation)
-\item \strong{maturity A} (\code{numeric}, giving the CMT rate for the respective maturity)
-\item \strong{maturity B} ...
-\item ...
+\item{Date (\code{date})}{, giving the day of the observation}
+\item{maturity A (\code{numeric})}{The CMT rate for the respective maturity}
+...
 }
 }
 \description{

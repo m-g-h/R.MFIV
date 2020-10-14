@@ -17,12 +17,11 @@
 #' \href{https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx?data=yieldAll}{complete dataset}.
 #' Also accepts links from this website with other selections than "All", see e.g. the example.
 #'
-#' @return Returns a \code{data.table} containing the scraped CMT data:
+#' @return Returns a \code{data.table} containing the following columns:
 #' \itemize{
-#'   \item \strong{Date} (\code{date}, giving the day of the observation)
-#'   \item \strong{maturity A} (\code{numeric}, giving the CMT rate for the respective maturity)
-#'   \item \strong{maturity B} ...
-#'   \item ...
+#'   \item{Date (\code{date})}{ - the day of the observation}
+#'   \item{maturity A (\code{numeric})}{ - the CMT rate for the respective maturity}
+#'   \item{...}
 #' }
 #' @export
 #'
