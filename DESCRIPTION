@@ -14,7 +14,12 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
-    mathjaxr
+    mathjaxr,
+    data.table,
+    crayon,
+    rvest,
+    xml2,
+    lubridate
 Suggests: 
     testthat (>= 2.1.0),
     covr
