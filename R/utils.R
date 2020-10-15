@@ -13,5 +13,7 @@ utils::globalVariables(c(".",
                          "R",
                          "maturity",
                          "patterns",
-                         "spline")
+                         "spline",
+                         "K",
+                         "p")
 )
