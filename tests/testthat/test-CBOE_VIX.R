@@ -96,24 +96,32 @@ test_that("CBOE_delta_K() works", {
 
   strikes <- c(10, 12.5, c(1:10)*5 + 10, 62.5, 65)
 
-testthat::expect_equal(CBOE_delta_K(K = strikes),
-                       c(2.50, 2.50, 3.75, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 3.75, 2.50, 2.50))
+  testthat::expect_equal(CBOE_delta_K(K = strikes),
+                         c(2.50, 2.50, 3.75, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 3.75, 2.50, 2.50))
 })
 
 test_that("CBOE_F_0() works", {
   testthat::expect_equal(CBOE_F_0(option_quotes = option_dataset$option_quotes[[1]],
-           R = 0.005,
-           maturity = 0.07),
-           147.40514177480915)
+                                  R = 0.005,
+                                  maturity = 0.07),
+                         147.40514177480915)
 })
 
 test_that("CBOE_K_0() works", {
-
-  F_0 <- CBOE_F_0(option_quotes = option_dataset$option_quotes[[1]],
-           R = 0.005,
-           maturity = 0.07)
-
   testthat::expect_equal(CBOE_K_0(option_quotes = option_dataset$option_quotes[[1]],
-           F_0 = F_0),
-           147)
+                                  F_0 = 147.5),
+                         147)
+})
+
+test_that("CBOE_sigma_sq() works", {
+
+  sel_option_quotes <- CBOE_option_selection(option_dataset$option_quotes[[1]],
+                                         147)
+
+  testthat::expect_equal(CBOE_sigma_sq(sel_option_quotes = sel_option_quotes,
+                                       K_0 = 147,
+                                       F_0 = 147.5,
+                                       maturity = 0.07,
+                                       R = 0.005),
+                         0.014171619562701705)
 })

@@ -16,5 +16,6 @@ utils::globalVariables(c(".",
                          "spline",
                          "K",
                          "p",
-                         "F_0")
+                         "F_0",
+                         "Q")
 )

@@ -24,6 +24,7 @@ K_N - K_{N-1} \; \; \; if \; i = N \\\\\
 }
 \examples{
 
+library(R.MFIV)
 strikes <- c(10, 12.5, c(1:10)*5 + 10, 62.5, 65)
 CBOE_delta_K(K = strikes)
 }

@@ -2,15 +2,7 @@
 % Please edit documentation in R/CBOE_VIX.R
 \name{CBOE_option_selection}
 \alias{CBOE_option_selection}
-\title{CBOE Option selection scheme
-\loadmathjax
-This function performs the selection of out-of-the-money options as explained in the
-\href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}:
-\emph{"Select out-of-the-money put options with strike prices \mjseqn{< K_0}. Start with the put strike
-immediately lower than K0 and move to successively lower strike prices. Exclude any put option
-that has a bid price equal to zero (i.e., no bid). As shown below, once two puts with consecutive
-strike prices are found to have zero bid prices, no puts with lower strikes are considered for inclusion."}
-The same principle applies to call options in ascending direction.}
+\title{CBOE Option selection scheme}
 \usage{
 CBOE_option_selection(option_quotes, K_0)
 }
@@ -22,17 +14,18 @@ CBOE_option_selection(option_quotes, K_0)
 \item {\strong{p} (\code{numeric})}{ - put option price}
 }}
 
-\item{K_0}{\code{numeric scalar}, giving the theoretical at-the-money strike price}
+\item{K_0}{\code{numeric scalar}, giving the theoretical at-the-money strike price
+(see \code{\link{CBOE_K_0}})}
 }
 \value{
-Returns a \code{data.table} with two columns:
+Returns a \code{data.table} with three columns:
 \itemize{
-\item K (\code{numeric}, strike price in ascending order)
-\item c (\code{numeric}, out-of-the money option prices)
-}
+\item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
+\item {\strong{c} (\code{numeric})}{ - call option price}
+\item {\strong{p} (\code{numeric})}{ - put option price}
+} which is filtered according to the CBOE rules
 }
 \description{
-CBOE Option selection scheme
 \loadmathjax
 This function performs the selection of out-of-the-money options as explained in the
 \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}:
