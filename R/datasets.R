@@ -19,3 +19,23 @@
 #'
 #' @source \href{https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx?data=yieldAll}{US Treasury website}
 "cmt_dataset"
+
+#' Example option quote dataset.
+#'
+#' @format A \code{data.table} with the following columns:
+#' \itemize{
+#'   \item{\strong{ticker}   (\code{character})}{ - the underlying stock ticker symbol}
+#'   \item{\strong{t}  (\code{datetime})}{ - the time of quotation}
+#'   \item{\strong{exp}  (\code{date})}{ - the expiration date}
+#'   \item{\strong{price}  (\code{numeric})}{ - the underlying stock price}
+#'   \item{\strong{option_quotes}  (\code{data.table})}{ - a "nest" of option quotes.
+#'   Each cell in this column contains a \code{data.table} with the following columns:
+#'     \itemize{
+#'       \item{\strong{K}  (\code{numeric})}{ - the strike price}
+#'       \item{\strong{c}  (\code{numeric})}{ - the corresponding call price}
+#'       \item{\strong{p}  (\code{numeric})}{ - the correspondign put price}
+#'     }
+#'   }
+#' }
+#'
+"option_dataset"
