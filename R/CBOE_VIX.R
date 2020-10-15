@@ -156,10 +156,6 @@ CBOE_delta_K <- function(K){
 #'          R = 0.005,
 #'          maturity = 0.07)
 
-CBOE_F_0 <- function(option_quotes, R, maturity){
-  data.table(option_quotes = list(option_quotes),
-             R = R,
-             maturity = maturity
-  )[, option_quotes[[1]][which.min(abs(c-p)), .(F_0 = K + exp(R*maturity) * (c-p))]
-    ][, F_0]
+CBOE_K_0 <- function(option_quotes, F_0){
+  nested[[1]][K <= F_0, K[.N]]
 }
