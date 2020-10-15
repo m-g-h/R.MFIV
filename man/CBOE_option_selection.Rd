@@ -12,14 +12,14 @@ that has a bid price equal to zero (i.e., no bid). As shown below, once two puts
 strike prices are found to have zero bid prices, no puts with lower strikes are considered for inclusion."}
 The same principle applies to call options in ascending direction.}
 \usage{
-CBOE_option_selection(nested, K_0)
+CBOE_option_selection(option_quotes, K_0)
 }
 \arguments{
-\item{nested}{A \code{data.table} or "nest" with three columns:
+\item{option_quotes}{A \code{data.table} or "nest" of option quotes with three columns:
 \itemize{
-\item K (\code{numeric}, strike price in ascending order)
-\item c (\code{numeric}, call option price)
-\item p (\code{numeric}, put option price)
+\item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
+\item {\strong{c} (\code{numeric})}{ - call option price}
+\item {\strong{p} (\code{numeric})}{ - put option price}
 }}
 
 \item{K_0}{\code{numeric scalar}, giving the theoretical at-the-money strike price}

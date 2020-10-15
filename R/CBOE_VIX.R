@@ -60,11 +60,11 @@
 #' strike prices are found to have zero bid prices, no puts with lower strikes are considered for inclusion."}
 #' The same principle applies to call options in ascending direction.
 #'
-#' @param nested A \code{data.table} or "nest" with three columns:
+#' @param option_quotes A \code{data.table} or "nest" of option quotes with three columns:
 #' \itemize{
-#'   \item K (\code{numeric}, strike price in ascending order)
-#'   \item c (\code{numeric}, call option price)
-#'   \item p (\code{numeric}, put option price)
+#'   \item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
+#'   \item {\strong{c} (\code{numeric})}{ - call option price}
+#'   \item {\strong{p} (\code{numeric})}{ - put option price}
 #' }
 #' @param K_0 \code{numeric scalar}, giving the theoretical at-the-money strike price
 #'
@@ -78,10 +78,10 @@
 #' @importFrom data.table shift fifelse
 #' @export
 #'
-CBOE_option_selection <- function(nested, K_0){
-  nested[1:.N %between% c(tail(c(1, which(is.na(shift(p, type = "lag"))  + is.na(p) == 2 & K <= K_0) + 1),      n = 1),
-                          head(c(   which(is.na(shift(c, type = "lead")) + is.na(c) == 2 & K  > K_0) - 1 , .N), n = 1)),
-         .SD
+CBOE_option_selection <- function(option_quotes, K_0){
+  option_quotes[1:.N %between% c(tail(c(1, which(is.na(shift(p, type = "lag"))  + is.na(p) == 2 & K <= K_0) + 1),      n = 1),
+                                 head(c(   which(is.na(shift(c, type = "lead")) + is.na(c) == 2 & K  > K_0) - 1 , .N), n = 1)),
+                .SD
   ][!is.na(c),
   ][!is.na(p),]
 }
