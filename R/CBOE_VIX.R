@@ -139,8 +139,8 @@ CBOE_delta_K <- function(K){
 #' difference is smallest.
 #'
 #' @inheritParams CBOE_option_selection
-#' @param R \code{numeric scalar or vector} giving the risk-free rate(s) \mjseqn{R}
-#' @param maturity \code{numeric scalar or vector} giving the time(s) to maturity \mjseqn{T}
+#' @param R \code{numeric scalar} giving the risk-free rate(s) \mjseqn{R}
+#' @param maturity \code{numeric scalar} giving the time(s) to maturity \mjseqn{T}
 #'
 #' @return Returns a \code{numeric scalar}, giving the theoretical at-the-money
 #'  forward \mjseqn{F_0}
@@ -156,6 +156,39 @@ CBOE_delta_K <- function(K){
 #'          R = 0.005,
 #'          maturity = 0.07)
 
+CBOE_F_0 <- function(option_quotes, R, maturity){
+  option_quotes[which.min(abs(c-p)), K + exp(R*maturity) * (c-p)]
+}
+
+#' Calculate the theoretical at-the-money forward \mjseqn{K_0} from the CBOE VIX
+#' calculation.
+#' \loadmathjax
+#'
+#' @description Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}
+#' \mjseqn{K_0} is defined as the strike price directly smaller or equal to the
+#' theoretical at-the-money forward price \mjseqn{F_0}
+#'
+#' @inheritParams CBOE_option_selection
+#' @param F_0 \code{numeric scalar}, giving the  theoretical at-the-money forward \mjseqn{F_0}
+#' (see \code{\link{CBOE_F_0}})
+#'
+#' @return Returns a \code{numeric scalar}, giving the theoretical at-the-money
+#'  strike \mjseqn{K_0}
+#' @export
+#'
+#' @examples
+#'
+#' library(R.MFIV)
+#'
+#' nest <- option_dataset$option_quotes[[1]]
+#'
+#' F_0 <- CBOE_F_0(option_quotes = nest,
+#'          R = 0.005,
+#'          maturity = 0.07)
+#'
+#' K_0 <- CBOE_K_0(option_quotes = nest,
+#'          F_0 = F_0)
+
 CBOE_K_0 <- function(option_quotes, F_0){
-  nested[[1]][K <= F_0, K[.N]]
+  option_quotes[K <= F_0, K[.N]]
 }

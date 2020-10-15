@@ -15,9 +15,9 @@ CBOE_F_0(option_quotes, R, maturity)
 \item {\strong{p} (\code{numeric})}{ - put option price}
 }}
 
-\item{R}{\code{numeric scalar or vector} giving the risk-free rate(s) \mjseqn{R}}
+\item{R}{\code{numeric scalar} giving the risk-free rate(s) \mjseqn{R}}
 
-\item{maturity}{\code{numeric scalar or vector} giving the time(s) to maturity \mjseqn{T}}
+\item{maturity}{\code{numeric scalar} giving the time(s) to maturity \mjseqn{T}}
 }
 \value{
 Returns a \code{numeric scalar}, giving the theoretical at-the-money

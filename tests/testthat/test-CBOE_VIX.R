@@ -105,5 +105,15 @@ test_that("CBOE_F_0() works", {
            R = 0.005,
            maturity = 0.07),
            147.40514177480915)
-  ## Multiple Values
+})
+
+test_that("CBOE_K_0() works", {
+
+  F_0 <- CBOE_F_0(option_quotes = option_dataset$option_quotes[[1]],
+           R = 0.005,
+           maturity = 0.07)
+
+  testthat::expect_equal(CBOE_K_0(option_quotes = option_dataset$option_quotes[[1]],
+           F_0 = F_0),
+           147)
 })
