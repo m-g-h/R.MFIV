@@ -99,3 +99,11 @@ test_that("CBOE_delta_K() works", {
 testthat::expect_equal(CBOE_delta_K(K = strikes),
                        c(2.50, 2.50, 3.75, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 3.75, 2.50, 2.50))
 })
+
+test_that("CBOE_F_0() works", {
+  testthat::expect_equal(CBOE_F_0(option_quotes = option_dataset$option_quotes[[1]],
+           R = 0.005,
+           maturity = 0.07),
+           147.40514177480915)
+  ## Multiple Values
+})

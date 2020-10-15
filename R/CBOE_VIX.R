@@ -125,3 +125,41 @@ CBOE_delta_K <- function(K){
   } else {
     ret}
 }
+
+#' Calculate the theoretical at-the-money forward \mjseqn{F_0} from the CBOE VIX calculation.
+#' \loadmathjax
+#'
+#' @description Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper} this function
+#' calculates \mjseqn{F_0} as:
+#'
+#' \mjsdeqn{F_0 := Strike Price + e^{RT} (Call Price - Put Price)}
+#'
+#' \mjseqn{R}is the risk-free-rate (in decimal) for the corresponding time-to-maturity
+#' \mjseqn{T} (in years). The \mjseqn{Call Price} and \mjseqn{Put Price} are those where their absolute
+#' difference is smallest.
+#'
+#' @inheritParams CBOE_option_selection
+#' @param R \code{numeric scalar or vector} giving the risk-free rate(s) \mjseqn{R}
+#' @param maturity \code{numeric scalar or vector} giving the time(s) to maturity \mjseqn{T}
+#'
+#' @return Returns a \code{numeric scalar}, giving the theoretical at-the-money
+#'  forward \mjseqn{F_0}
+#' @export
+#'
+#' @examples
+#'
+#' library(R.MFIV)
+#'
+#' nest <- option_dataset$option_quotes[[1]]
+#'
+#' CBOE_F_0(option_quotes = nest,
+#'          R = 0.005,
+#'          maturity = 0.07)
+
+CBOE_F_0 <- function(option_quotes, R, maturity){
+  data.table(option_quotes = list(option_quotes),
+             R = R,
+             maturity = maturity
+  )[, option_quotes[[1]][which.min(abs(c-p)), .(F_0 = K + exp(R*maturity) * (c-p))]
+    ][, F_0]
+}
