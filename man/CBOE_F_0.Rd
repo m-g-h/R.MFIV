@@ -30,9 +30,9 @@ calculates \mjseqn{F_0} as:
 
 \mjsdeqn{F_0 := Strike Price + e^{RT} (Call Price - Put Price)}
 
-\mjseqn{R}is the risk-free-rate (in decimal) for the corresponding time-to-maturity
-\mjseqn{T} (in years). The \mjseqn{Call Price} and \mjseqn{Put Price} are those where their absolute
-difference is smallest.
+The variable \mjseqn{R} is the risk-free-rate (in decimal) for the corresponding time-to-maturity
+\mjseqn{T} (in years). The \mjseqn{Strike Price}, \mjseqn{Call Price} and \mjseqn{Put Price} are
+those where the absolute difference of the latter two is smallest.
 }
 \examples{
 

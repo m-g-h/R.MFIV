@@ -1,55 +1,3 @@
-# CBOE_VIX <- function(t, nest, R, T_n, Price){
-#   ## Stop if there are two or less quotes
-#   if(nrow(nest) < 2){
-#     return(NA)
-#   }
-#   F_0 <- nest[which.min(abs(c-p)), .(F_0 = K + exp(R*T_n) * (c-p))][1, F_0]
-#   K_0 <- nest[K <= F_0, K[.N]]
-#   ## HELPERS
-#   n_put_raw <- nest[K<K_0 &!is.na(p), .N]
-#   n_call_raw <- nest[K>K_0 &!is.na(c), .N]
-#   ## Stop if there are no puts or calls
-#   if(n_put_raw == 0 | n_call_raw == 0){
-#     return(NA)
-#   }
-#   ## ATM IV
-#   SD <- fOptions::GBSVolatility(price = nest[K == K_0, c],
-#                                 TypeFlag = "c",
-#                                 S = Price,
-#                                 X = K_0,
-#                                 Time = T_n,
-#                                 r = R/T_n,
-#                                 b = 0)
-#   ## OPTION SELECTION
-#   nest_sel <- R.MFIV::CBOE_option_selection(nest, K_0)
-#   ## DESCRIPTIVES
-#   n_put <- nest_sel[K<K_0, .N]
-#   n_call <- nest_sel[K>K_0, .N]
-#   max_K <- nest_sel[which.max(K), K]
-#   min_K <- nest_sel[which.min(K), K]
-#   mean_delta_K <- nest_sel[, .(delta_K = mean(K - shift(K), na.rm = T))][1,delta_K]
-#   n <- n_put + n_call +1
-#   ## Stop if there are no puts or calls
-#   if(n_put == 0 | n_call == 0){
-#     return(NA)
-#   }
-#   ## sigma^2
-#   sigma_sq <- R.MFIV::calc_sigma_sq(nest_sel, F_0, K_0, T_n, R)[1,sigma]
-#   ## RETURN
-#   list(F_0,
-#        K_0,
-#        n_put_raw,
-#        n_call_raw,
-#        SD,
-#        n_put,
-#        n_call,
-#        max_K,
-#        min_K,
-#        mean_delta_K,
-#        n,
-#        sigma_sq)
-# }
-
 #' Calculate the theoretical at-the-money forward \mjseqn{F_0} from the CBOE VIX calculation.
 #' \loadmathjax
 #'
@@ -58,9 +6,9 @@
 #'
 #' \mjsdeqn{F_0 := Strike Price + e^{RT} (Call Price - Put Price)}
 #'
-#' \mjseqn{R}is the risk-free-rate (in decimal) for the corresponding time-to-maturity
-#' \mjseqn{T} (in years). The \mjseqn{Call Price} and \mjseqn{Put Price} are those where their absolute
-#' difference is smallest.
+#' The variable \mjseqn{R} is the risk-free-rate (in decimal) for the corresponding time-to-maturity
+#' \mjseqn{T} (in years). The \mjseqn{Strike Price}, \mjseqn{Call Price} and \mjseqn{Put Price} are
+#' those where the absolute difference of the latter two is smallest.
 #'
 #' @param option_quotes A \code{data.table} or "nest" of option quotes with three columns:
 #' \itemize{
@@ -233,11 +181,127 @@ CBOE_delta_K <- function(K){
 
 CBOE_sigma_sq <- function(sel_option_quotes, K_0, F_0, maturity, R){
   sel_option_quotes[, .(K = K,
-                    Q = fcase(K < K_0, p,
-                              K > K_0, c,
-                              K == K_0, (c+p)/2
-                              )
-                    )][, ( (2/maturity) *  sum((  CBOE_delta_K(K) / (K^2) ) * ( exp(R*maturity) ) * Q ) ) - ( (1/maturity) * (( (F_0/K_0) - 1 )^2) )
+                        Q = fcase(K < K_0, p,
+                                  K > K_0, c,
+                                  K == K_0, (c+p)/2
+                        )
+  )][, ( (2/maturity) *  sum((  CBOE_delta_K(K) / (K^2) ) * ( exp(R*maturity) ) * Q ) ) - ( (1/maturity) * (( (F_0/K_0) - 1 )^2) )
   ]
 }
 
+#' Calculate all variables needed for the calculation of the CBOE VIX
+#'
+#' @description This is a wrapper around the \code{CBOe_...} functions that performs the calculation
+#' of all variables required for the calculation of the squared model free implied volatility (\mjseqn{\sigma^2})
+#' as per the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}:
+#'
+#' \loadmathjax
+#' \mjsdeqn{\sigma^2 = \frac{2}{T} \left(\sum_i \frac{\Delta K_i}{K_i^2} Q(K_i) e^{rT} \right) - \frac{1}{T} \left( \frac{F_0}{K_0} - 1 \right)^2}
+#'
+#' @inheritParams CBOE_F_0
+#' @inheritParams CBOE_sigma_sq
+#' @param ret_vars A \code{logical scalar} - if true, all VIX variables are returned, else only \mjseqn{\sigma^2}
+#' is returned.
+#'
+#' @return Returns either a \code{numeric scalar} giving \mjseqn{\sigma^2} or a \code{list} with all variables
+#' involved in the calculation:
+#' \itemize{
+#'   \item {\strong{F_0} (\code{numeric})}{ - theoretical at-the money forward \mjseqn{F_0}
+#'    (see \code{\link{CBOE_F_0}})}
+#'   \item {\strong{K_0} (\code{numeric})}{ - theoretical at-the money strike \mjseqn{K_0}
+#'    (see \code{\link{CBOE_K_0}})}
+#'   \item {\strong{n_put_raw} (\code{numeric})}{ - number of put options before option selection
+#'    (see \code{\link{CBOE_option_selection}})}
+#'   \item {\strong{n_call_raw} (\code{numeric})}{ - number of call options before option selection
+#'    (see \code{\link{CBOE_option_selection}})}
+#'   \item {\strong{n_put} (\code{numeric})}{ - number of put options after option selection}
+#'   \item {\strong{n_call} (\code{numeric})}{ - number of call options after option selection}
+#'   \item {\strong{sigma_sq} (\code{numeric})}{ - squared model free implied volatility \mjseqn{\sigma^2}
+#'    (see \code{\link{CBOE_sigma_sq}})}
+#' }
+#' @export
+#'
+#' @examples
+#'
+#' library(R.MFIV)
+#'
+#' nest <- option_dataset$option_quotes[[1]]
+#' CBOE_VIX_vars(option_quotes = nest,
+#'               R = 0.005,
+#'               maturity = 0.07,
+#'               ret_vars = TRUE)
+#'
+CBOE_VIX_vars <- function(option_quotes, R, maturity,
+                          ret_vars = F){
+  ## Stop if there are two or less quotes
+  if(nrow(option_quotes) < 2){
+    warning(crayon::silver("NA "),
+            "returned. There were less than two quotes in ",
+            crayon::silver("`option_quotes`"),
+            ".")
+    return(NA)
+  }
+  ## CALCULATE FIRST TWO VARIABLES
+  F_0 <- CBOE_F_0(option_quotes = option_quotes,
+                  R = R,
+                  maturity = maturity)
+
+  K_0 <- CBOE_K_0(option_quotes = option_quotes,
+                  F_0 = F_0)
+  ## HELPERS
+  n_put_raw <- option_quotes[K<K_0 &!is.na(p), .N]
+  n_call_raw <- option_quotes[K>K_0 &!is.na(c), .N]
+  ## Stop if there are no puts or calls
+  if(n_put_raw == 0 | n_call_raw == 0){
+    warning(crayon::silver("NA "),
+            "returned. There were no put / call quotes in ",
+            crayon::silver("`option_quotes`"),
+            ".")
+    return(NA)
+  }
+
+  ## OPTION SELECTION
+  option_quotes_sel <- CBOE_option_selection(option_quotes = option_quotes,
+                                             K_0 = K_0)
+  ## HELPERS 2
+  n_put <- option_quotes_sel[K<K_0, .N]
+  n_call <- option_quotes_sel[K>K_0, .N]
+  ## Stop if there are no puts or calls
+  if(n_put == 0 | n_call == 0){
+    warning(crayon::silver("NA "),
+            "returned. There wereno put / call quotes left in ",
+            crayon::silver("`option_quotes`"),
+            " after selecting by the CBOE rule.")
+    return(NA)
+  }
+  ## sigma^2
+  sigma_sq <- CBOE_sigma_sq(sel_option_quotes = option_quotes_sel,
+                            K_0 =  K_0,
+                            F_0 = F_0,
+                            maturity = maturity,
+                            R = R)
+  ## RETURN
+  if(ret_vars){
+    list("F_0" = F_0,
+         "K_0" = K_0,
+         "n_put_raw" = n_put_raw,
+         "n_call_raw" = n_call_raw,
+         "n_put" = n_put,
+         "n_call" = n_call,
+         "sigma_sq" = sigma_sq)
+  } else {
+    sigma_sq
+  }
+}
+
+# ## ATM IV
+#   SD <- fOptions::GBSVolatility(price = option_quotes[K == K_0, c],
+#                                 TypeFlag = "c",
+#                                 S = price,
+#                                 X = K_0,
+#                                 Time = maturity,
+#                                 r = R/maturity,
+#                                 b = 0)
+# max_K <- option_quotes_sel[which.max(K), K]
+# min_K <- option_quotes_sel[which.min(K), K]
+# mean_delta_K <- option_quotes_sel[, .(delta_K = mean(K - shift(K), na.rm = T))][1,delta_K]

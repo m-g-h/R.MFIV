@@ -2,6 +2,7 @@
 
 export(CBOE_F_0)
 export(CBOE_K_0)
+export(CBOE_VIX_vars)
 export(CBOE_delta_K)
 export(CBOE_option_selection)
 export(CBOE_sigma_sq)

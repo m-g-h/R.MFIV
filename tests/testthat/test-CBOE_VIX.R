@@ -1,7 +1,7 @@
 test_that("CBOE_option_selection() works", {
   ## CREATE MOCK CALL AND PUT QUOTES
-  calls <- 14:1
-  puts  <- 1:14
+  calls <- 16:1
+  puts  <- 1:16
 
   ## FUNCTION TO SET INDIVIDUAL VALUES TO NA
   set_NA <- function(indices, vector, rev = F){
@@ -24,7 +24,9 @@ test_that("CBOE_option_selection() works", {
                   c(1:2, 4),
                   c(1:2, 4:5),
                   c(4:5),
-                  c(2:3, 5:6))
+                  c(2:3, 5:6),
+                  c(2, 5:6),
+                  c(1:2, 4, 6:7 ))
 
   ## CREATE INDIVIDUAL CALL AND PUT VECTORS
   puts_NA <- purrr::map(.x = na_list,
@@ -43,7 +45,9 @@ test_that("CBOE_option_selection() works", {
                       c(1:2, 4),
                       c(1:5),
                       c(1:5),
-                      c(1:6))
+                      c(1:6),
+                      c(1:6),
+                      c(1:7))
   cor_puts_NA <- purrr::map(.x = na_list_cor,
                             .f = set_NA,
                             puts,
@@ -58,7 +62,7 @@ test_that("CBOE_option_selection() works", {
 
   df_NA <- purrr::map2_dfr(crossed_NA, 1:length(crossed_NA),
                            .f = ~data.table::data.table(index = .y,
-                                                        K = 1:14,
+                                                        K = 1:16,
                                                         c = .x[[1]],
                                                         p = .x[[2]]))
   nest_NA <- df_NA[, .(nest = list(.SD)),
@@ -69,7 +73,7 @@ test_that("CBOE_option_selection() works", {
 
   cor_df_NA <- purrr::map2_dfr(cor_crossed_NA, 1:length(cor_crossed_NA),
                                .f = ~data.table::data.table(index = .y,
-                                                            K = 1:14,
+                                                            K = 1:16,
                                                             c = .x[[1]],
                                                             p = .x[[2]]))
 
@@ -116,7 +120,7 @@ test_that("CBOE_K_0() works", {
 test_that("CBOE_sigma_sq() works", {
 
   sel_option_quotes <- CBOE_option_selection(option_dataset$option_quotes[[1]],
-                                         147)
+                                             147)
 
   testthat::expect_equal(CBOE_sigma_sq(sel_option_quotes = sel_option_quotes,
                                        K_0 = 147,
@@ -124,4 +128,98 @@ test_that("CBOE_sigma_sq() works", {
                                        maturity = 0.07,
                                        R = 0.005),
                          0.014171619562701705)
+})
+test_that("CBOE_VIX_vars() works", {
+  nest <- option_dataset$option_quotes[[1]]
+
+  ## SINGLE RESULT
+  testthat::expect_equal(CBOE_VIX_vars(option_quotes = nest,
+                                       R = 0.005,
+                                       maturity = 0.07,
+                                       ret_vars = F),
+                         0.014228381720205173)
+  ## LIST RESULT
+
+  VIX_vars <- CBOE_VIX_vars(option_quotes = nest,
+                            R = 0.005,
+                            maturity = 0.07,
+                            ret_vars = T)
+
+  # ## SAVE RESULTS
+  # saveRDS(VIX_vars, "tests/testthat/cor_VIX_vars")
+
+  ## LOAD RESULTS
+  cor_VIX_vars <- readRDS("cor_VIX_vars")
+
+  testthat::expect_equal(VIX_vars,
+                         cor_VIX_vars)
+})
+
+test_that("CBOE_VIX_vars() warnings work", {
+
+  ## FIRST WARNING
+  nest_1 <- option_dataset$option_quotes[[1]][1,]
+
+  ## IS A NA VALUE RETURNED?
+  testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_1,
+                                                        R = 0.005,
+                                                        maturity = 0.07,
+                                                        ret_vars = F)),
+                         NA)
+  ## IS IT THE FIRST WARNING MESSAGE
+  testthat::expect_warning(CBOE_VIX_vars(option_quotes = nest_1,
+                                         R = 0.005,
+                                         maturity = 0.07,
+                                         ret_vars = F),
+                           regexp = "There were less than two quotes in")
+
+  ## SECOND WARNING
+  nest_2 <- option_dataset$option_quotes[[1]][1:2,]
+
+  ## IS A NA VALUE RETURNED?
+  testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_2,
+                                                        R = 0.005,
+                                                        maturity = 0.07,
+                                                        ret_vars = F)),
+                         NA)
+  ## IS IT THE SECOND WARNING MESSAGE
+  testthat::expect_warning(CBOE_VIX_vars(option_quotes = nest_2,
+                                         R = 0.005,
+                                         maturity = 0.07,
+                                         ret_vars = F),
+                           regexp = "There were no put / call quotes in")
+
+  ## THIRD WARNING FOR CALLS
+  nest_3 <- option_dataset$option_quotes[[1]]
+  nest_3$c[60:61] <- NA
+
+  ## IS A NA VALUE RETURNED?
+  testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_3,
+                                                        R = 0.005,
+                                                        maturity = 0.07,
+                                                        ret_vars = F)),
+                         NA)
+  ## IS IT THE THIRD WARNING MESSAGE
+  testthat::expect_warning(CBOE_VIX_vars(option_quotes = nest_3,
+                                         R = 0.005,
+                                         maturity = 0.07,
+                                         ret_vars = F),
+                           regexp = "after selecting by the CBOE rule")
+
+  ## THIRD WARNING FOR PUTS
+  nest_4 <- option_dataset$option_quotes[[1]]
+  nest_4$p[58:57] <- NA
+
+  ## IS A NA VALUE RETURNED?
+  testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_4,
+                                                        R = 0.005,
+                                                        maturity = 0.07,
+                                                        ret_vars = F)),
+                         NA)
+  ## IS IT THE THIRD WARNING MESSAGE
+  testthat::expect_warning(CBOE_VIX_vars(option_quotes = nest_4,
+                                         R = 0.005,
+                                         maturity = 0.07,
+                                         ret_vars = F),
+                           regexp = "after selecting by the CBOE rule")
 })
