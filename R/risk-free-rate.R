@@ -106,6 +106,8 @@ interpolate_rfr <- function(cmt_data = NULL, date, exp,
   ## USE PPACKAGE DATA IF NONE IS PROVIDED
   if(is.null(cmt_data)){
     cmt <- R.MFIV::cmt_dataset
+  } else {
+    cmt <- cmt_data
   }
 
   ## CHECK IF cmt_data COVERS RANGE OF date

@@ -49,3 +49,14 @@ test_that("interpolate_rfr() calculates multiple values", {
                          correct_rfr)
 
 })
+
+test_that("interpolate_rfr() errors when dates are not in cmt_data", {
+  testthat::expect_error(interpolate_rfr(date = lubridate::ymd("2020-01-01"),
+                                         exp = lubridate::date("2020-03-02")
+  ))
+
+  testthat::expect_error(interpolate_rfr(cmt_data = R.MFIV::cmt_dataset[1:10,],
+                                         date = lubridate::ymd("2020-01-01"),
+                                         exp = lubridate::date("2020-03-02")
+  ))
+})
