@@ -80,8 +80,48 @@
 #'
 CBOE_option_selection <- function(nested, K_0){
   nested[1:.N %between% c(tail(c(1, which(is.na(shift(p, type = "lag"))  + is.na(p) == 2 & K <= K_0) + 1),      n = 1),
-                                 head(c(   which(is.na(shift(c, type = "lead")) + is.na(c) == 2 & K  > K_0) - 1 , .N), n = 1)),
-                .SD
+                          head(c(   which(is.na(shift(c, type = "lead")) + is.na(c) == 2 & K  > K_0) - 1 , .N), n = 1)),
+         .SD
   ][!is.na(c),
-    ][!is.na(p),]
+  ][!is.na(p),]
+}
+
+#' Calculate the average strike price distance variable \mjseqn{\Delta K_i} from the CBOE VIX calculation.
+#'
+#' Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper} this function
+#' calculates \mjseqn{\Delta K_i} as \emph{"half the difference between the strike prices on either side of
+#' \mjseqn{K_i}"}:
+#' \loadmathjax
+#' \mjsdeqn{\Delta K_i := \begin{cases} K_1 - K_0 \qquad \; \; if \; i = 0 \\\\\
+#'                                      K_N - K_{N-1} \; \; \; if \; i = N \\\\\
+#'                                      \frac{K_{i+1} - K_{i-1}}{2} \qquad \; else
+#'                        \end{cases}}
+#'
+#' @param K A \code{numeric vector} of strike prices
+#'
+#' @return Returns a \code{numeric vector} giving the \mjseqn{\Delta K_i} variable of the CBOE VIX calculation.
+#' @export
+#'
+#' @importFrom data.table fifelse shift
+#'
+#' @examples
+#'
+#' strikes <- c(10, 12.5, c(1:10)*5 + 10, 62.5, 65)
+#' CBOE_delta_K(K = strikes)
+
+CBOE_delta_K <- function(K){
+
+  N <- length(K)
+  n <- 1:N
+
+  ret <- try(fifelse(n==1,
+                     (shift(K, type = "lead")-K),
+                     fifelse(n==N,
+                             (K-shift(K, type = "lag")),
+                             (shift(K, type = "lead") - shift(K, type = "lag"))/2
+                     )),silent = T)
+  if(class(ret)== "try-error"){
+    NA_real_
+  } else {
+    ret}
 }

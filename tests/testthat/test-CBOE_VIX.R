@@ -91,3 +91,11 @@ test_that("CBOE_option_selection() works", {
 
   testthat::expect_equal(mean(testdata$test), 1)
 })
+
+test_that("CBOE_delta_K() works", {
+
+  strikes <- c(10, 12.5, c(1:10)*5 + 10, 62.5, 65)
+
+testthat::expect_equal(CBOE_delta_K(K = strikes),
+                       c(2.50, 2.50, 3.75, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 5.00, 3.75, 2.50, 2.50))
+})
