@@ -9,5 +9,9 @@ NULL
 
 utils::globalVariables(c(".",
                          "Date",
-                         ".SD")
+                         ".SD",
+                         "R",
+                         "maturity",
+                         "patterns",
+                         "spline")
 )

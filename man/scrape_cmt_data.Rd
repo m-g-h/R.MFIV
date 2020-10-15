@@ -14,15 +14,15 @@ Also accepts links from this website with other selections than "All", see e.g. 
 \value{
 Returns a \code{data.table} containing the following columns:
 \itemize{
-\item{Date (\code{date})}{, giving the day of the observation}
-\item{maturity A (\code{numeric})}{The CMT rate for the respective maturity}
-...
+\item{Date (\code{date})}{ - the day of the observation}
+\item{maturity A (\code{numeric}, \emph{decimal})}{ - the CMT rate for the respective maturity in decimal}
+\item{...}
 }
 }
 \description{
 According to the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{2019 VIX whitepaper},
 \emph{"the risk-free interest rates, R1 and R2, are yields based on U.S. Treasury yield curve
-rates (commonly referred to as "Constant Maturity Treasury" rates or CMTs), to which a
+rates (commonly referred to as "Constant Maturity Treasury", rates or CMTs), to which a
 cubic spline is applied to derive yields on the expiration dates of relevant SPX options.
 As such, the VIX Index calculation may use different risk-free interest rates for near- and
 next-term options. Note in this example, T2 uses a value of 900 for Settlement day, which
