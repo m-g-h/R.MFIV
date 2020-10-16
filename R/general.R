@@ -57,3 +57,35 @@ option_descriptives <- function(option_quotes, K_0, R, price,  maturity){
        "n_put" = n_put,
        "n_call" = n_call)
 }
+
+#' List third fridays in the months of the period given by \code{start} and \code{end}
+#'
+#' The 2003 VIX (see the \href{https://web.archive.org/web/20091231021416/https://www.cboe.com/micro/vix/vixwhite.pdf}{2009 CBOE Whitepaper})
+#' is based on monthly option contracts, which expire on every third friday of a month.
+#' This function identifies monthly third fridays in order to select the correct monthly options.
+#'
+#' @param start \code{Date scalar}, giving the start date
+#' @param end  \code{Date scalar}, giving the end date
+#'
+#' @return Returns a \code{date vector} with all third fridays of the respective period.
+#' @export
+#'
+#' @examples
+#'
+#' start <- lubridate::ymd("2020-01-01")
+#' end <- lubridate::ymd("2020-06-01")
+#'
+#' third_fridays(start, end)
+
+third_fridays <- function(start, end){
+  ## ROUND DATES TO START AND END OF MONTHS RESPECTIVELY
+  alpha <- lubridate::floor_date(start, "months")
+  omega <- lubridate::ceiling_date(end, "months")
+
+  ## GENERATE SEQUENCE OF ALL SINGLE DAYS AND FILTER OUT THE THIRD FRIDAYS
+  data.table::data.table(all_days = alpha + lubridate::days(1:as.numeric(omega - alpha))
+  )[lubridate::wday(all_days) == 6,
+  ][,my := paste(lubridate::year(all_days), lubridate::month(all_days))
+  ][, ind := 1:.N, by = my
+  ][ind == 3, all_days]
+}

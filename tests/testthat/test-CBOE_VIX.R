@@ -223,3 +223,46 @@ test_that("CBOE_VIX_vars() warnings work", {
                                          ret_vars = F),
                            regexp = "after selecting by the CBOE rule")
 })
+
+test_that("CBOE_interpolation_terms() works", {
+  ##  WEEKLY
+  vals <- c(22.9, 23, 23.1,
+            29.9, 30, 30.1,
+            36.9, 37, 37.1)/365
+  res_wk <- numeric()
+  for (i in vals) {
+    res_wk <- c(res_wk, CBOE_interpolation_terms(maturity = i, method = "weekly"))
+  }
+  testthat::expect_equal(res_wk, c(NA, NA,1, 1, 1, 2, 2, 2, NA))
+
+  ## MONTHLY
+
+  ## 2020-17-01 is first, 2020-02-21 is second, 2020-03-20, is third 2020-04-17 is fourth valid friday
+  t <- lubridate::ymd("2020-01-09", # 17th is near-term, 21st next-term, 20th NA
+                      "2020-01-10", # 17th is NA,        21st near-term, 20th next-term
+                      "2020-01-11", # 17th is NA,        21st near-term, 20th next-term
+                      "2020-02-13", # 17th is NA,        21st near-term, 20th next-term
+                      "2020-02-14") # 21st is NA,        20th near-term, 17th next-term
+  exp <- lubridate::ymd("2020-01-24", # invalid friday, always NA
+                        "2020-01-17",
+                        "2020-02-21",
+                        "2020-03-20",
+                        "2020-04-17")
+
+  res_mn <- numeric()
+  for (i in 1:length(t)) {
+    for (j in 1:length(exp)) {
+      res_mn <- c(res_mn,
+                  CBOE_interpolation_terms(date_t = t[i],
+                                           date_exp = exp[j],
+                                           method = "monthly")
+      )
+    }
+  }
+  testthat::expect_equal(res_mn, c(NA, 1, 2, NA, NA,
+                                   NA, NA, 1, 2, NA,
+                                   NA, NA, 1, 2, NA,
+                                   NA, NA, 1, 2, NA,
+                                   NA, NA, NA, 1, 2))
+
+})

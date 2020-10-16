@@ -18,5 +18,8 @@ utils::globalVariables(c(".",
                          "p",
                          "F_0",
                          "Q",
-                         "delta_K")
+                         "delta_K",
+                         "all_days",
+                         "ind",
+                         "my")
 )

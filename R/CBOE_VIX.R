@@ -292,3 +292,56 @@ CBOE_VIX_vars <- function(option_quotes, R, maturity,
     sigma_sq
   }
 }
+
+#' Determine the expiration "term" used in the linear interpolation of the CBOE VIX
+#'
+#' @description Provide either \code{maturity} or \code{date_t} and \code{date_exp}
+#'
+#' This function determines the interpolation terms used for the VIX.
+#' It provides terms for the two different interpolation techniques used by the CBOE:
+#' \itemize{
+#'   \item {\strong{2003 VIX} (monthly):} {using monthly options (see the \href{https://web.archive.org/web/20091231021416/https://www.cboe.com/micro/vix/vixwhite.pdf}{2009 CBOE Whitepaper})}
+#'   \item {\strong{2014 VIX} (weekly):} {using weekly  options (see the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{2019 VIX whitepaper})}
+#' }
+#'
+#' Both methods rely on a "near-term" and a "next-term" contract.
+#'
+#' @inheritParams CBOE_F_0
+#' @param date_t (For the monthly method) \code{date scalar} giving the date of the option quotation
+#' @param date_exp (For the monthly method) \code{date scalar} giving the date of the option expiration
+#' @param method A \code{string scalar}, either \code{"weekly"} or \code{"monthly"} for the
+#' respective method.
+#'
+#' @return Returns a \code{numeric scalar}: \code{1} for the "near-term" and \code{2} for the "next-term".
+#' If the maturity doesn't fall inside either category, \code{NA} is returned.
+#' @export
+#'
+#' @examples
+#'
+#' library(R.MFIV)
+#'
+#' ## Weekly method
+#' CBOE_interpolation_terms(25/365, method = "weekly")
+#'
+#' ## Monthly method
+#' t <- lubridate::ymd("2020-01-02")
+#' exp <- lubridate::ymd("2020-02-21")
+#' CBOE_interpolation_terms(date_t = t, date_exp = exp, method = "monthly")
+#'
+CBOE_interpolation_terms <- function(maturity, date_t, date_exp, method){
+  ## WEEKLY METHOD
+  if(method == "weekly"){
+    fcase(maturity > 23/365  & maturity <= 30/365, 1,
+          maturity > 30/365  & maturity <= 37/365, 2,
+          TRUE , NA_real_)
+    ## MONTHLY METHOD
+  } else if(method == "monthly"){
+    valid_days <- third_fridays(date_t , date_exp + months(3))
+    valid_days <- valid_days[valid_days-date_t > 7]
+    fcase(date_exp == valid_days[1], 1,
+          date_exp == valid_days[2], 2,
+          TRUE , NA_real_)
+  }
+}
+
+
