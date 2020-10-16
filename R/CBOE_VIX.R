@@ -345,3 +345,50 @@ CBOE_interpolation_terms <- function(maturity, date_t, date_exp, method){
 }
 
 
+#' Calculates the linear VIX interpolation and returns the
+#' annualised VIX index in percentage points
+#'
+#' \loadmathjax
+#' Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}, the VIX index is
+#' calculated as a linear interpolation. This function uses the following formula:
+#' \mjsdeqn{\sigma_{VIX} =  100 \sqrt{ \big( \omega T_1 \sigma_1^2 + (1- \omega) T_2 \sigma_2^2 \big) \frac{525,600}{43,200} }}
+#' where the subscripts \mjseqn{1} and \mjseqn{2} indicate the near-and next-term options, \mjseqn{T_\cdot}
+#' to the time to expiration in years and the \mjseqn{\omega} to the linear interpolation weights.
+#'
+#' @param maturity \code{numeric vector of length two} giving the time to maturity of the
+#' "near-term" and "next-term" options in years (\mjseqn{T_1} and \mjseqn{T_2} respectively)
+#' @param sigma_sq \code{numeric vector of length two} giving the CBOE model-free implied volatility
+#' of the "near-term" and "next-term" options(\mjseqn{\sigma^2_1} and \mjseqn{\sigma^2_2} respectively).
+#'  Also see \code{\link{CBOE_sigma_sq}}
+#'
+#' @return Returns a \code{numeric scalar} giving the VIX index value
+#' @export
+#'
+#' @examples
+#'
+#' library(R.MFIV)
+#'
+#' CBOE_VIX_index(maturity = c(0.074, 0.09),
+#'                sigma_sq = c(0.3, 0.5))
+#'
+#'
+CBOE_VIX_index <- function(maturity, sigma_sq){
+  if(length(maturity) != 2
+     |length(sigma_sq) != 2){
+    stop(crayon::red("the provided arguments "),
+         crayon::silver("`maturity` "),
+         crayon::red("and "),
+         crayon::silver("`sigma_sq` "),
+         crayon::red("are not of length "),
+         crayon::silver("2"),
+         crayon::red(". See "),
+         crayon::blue("`help(CBOE_VIX_interpolation)`"))
+  }
+  ## LINEAR INTERPOLATION
+  sigma_sq_30 <- stats::approx(x = maturity,
+                y = sigma_sq*maturity,
+                xout = 30/365)$y
+
+  ## CALCULATE ANNUALISED STANDARD DEVIATION IN PERCENTAGE POINTS
+  100 * sqrt(sigma_sq_30 * (365*24*60) / (30*24*60))
+}

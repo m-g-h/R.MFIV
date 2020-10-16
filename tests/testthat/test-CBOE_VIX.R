@@ -266,3 +266,15 @@ test_that("CBOE_interpolation_terms() works", {
                                    NA, NA, NA, 1, 2))
 
 })
+
+test_that("CBOE_VIX_index() works", {
+  ## TEST ERROR MESSAGES
+  testthat::expect_error(CBOE_VIX_index(maturity = 1, sigma_sq = c(1,2)))
+  testthat::expect_error(CBOE_VIX_index(maturity = c(1,2), sigma_sq = 1))
+  testthat::expect_error(CBOE_VIX_index(maturity = 1, sigma_sq = 1))
+
+  ## NORMAL CALCULATION
+  testthat::expect_equal(CBOE_VIX_index(maturity = c(0.074, 0.09),
+                       sigma_sq = c(0.3, 0.5)),
+                       64.196962544967803)
+})
