@@ -5,8 +5,7 @@ Authors@R:
     person(given = "Martin Georg",
            family = "Haas",
            role = c("aut", "cre"),
-           email = "haasmartin@live.de",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           email = "haasmartin@live.de")
 Description: What the package does (one paragraph).
 License: AGPL-3
 Encoding: UTF-8
@@ -19,7 +18,8 @@ Imports:
     crayon,
     rvest,
     xml2,
-    lubridate
+    lubridate,
+    fOptions
 Suggests: 
     testthat (>= 2.1.0),
     covr,

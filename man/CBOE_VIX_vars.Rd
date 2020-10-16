@@ -41,7 +41,7 @@ involved in the calculation:
 }
 }
 \description{
-This is a wrapper around the \code{CBOe_...} functions that performs the calculation
+This is a wrapper around the \code{CBOE_...} functions that performs the calculation
 of all variables required for the calculation of the squared model free implied volatility (\mjseqn{\sigma^2})
 as per the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}:
 

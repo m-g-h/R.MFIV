@@ -17,5 +17,6 @@ utils::globalVariables(c(".",
                          "K",
                          "p",
                          "F_0",
-                         "Q")
+                         "Q",
+                         "delta_K")
 )

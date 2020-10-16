@@ -191,7 +191,7 @@ CBOE_sigma_sq <- function(sel_option_quotes, K_0, F_0, maturity, R){
 
 #' Calculate all variables needed for the calculation of the CBOE VIX
 #'
-#' @description This is a wrapper around the \code{CBOe_...} functions that performs the calculation
+#' @description This is a wrapper around the \code{CBOE_...} functions that performs the calculation
 #' of all variables required for the calculation of the squared model free implied volatility (\mjseqn{\sigma^2})
 #' as per the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}:
 #'
@@ -199,7 +199,6 @@ CBOE_sigma_sq <- function(sel_option_quotes, K_0, F_0, maturity, R){
 #' \mjsdeqn{\sigma^2 = \frac{2}{T} \left(\sum_i \frac{\Delta K_i}{K_i^2} Q(K_i) e^{rT} \right) - \frac{1}{T} \left( \frac{F_0}{K_0} - 1 \right)^2}
 #'
 #' @inheritParams CBOE_F_0
-#' @inheritParams CBOE_sigma_sq
 #' @param ret_vars A \code{logical scalar} - if true, all VIX variables are returned, else only \mjseqn{\sigma^2}
 #' is returned.
 #'
@@ -293,15 +292,3 @@ CBOE_VIX_vars <- function(option_quotes, R, maturity,
     sigma_sq
   }
 }
-
-# ## ATM IV
-#   SD <- fOptions::GBSVolatility(price = option_quotes[K == K_0, c],
-#                                 TypeFlag = "c",
-#                                 S = price,
-#                                 X = K_0,
-#                                 Time = maturity,
-#                                 r = R/maturity,
-#                                 b = 0)
-# max_K <- option_quotes_sel[which.max(K), K]
-# min_K <- option_quotes_sel[which.min(K), K]
-# mean_delta_K <- option_quotes_sel[, .(delta_K = mean(K - shift(K), na.rm = T))][1,delta_K]
