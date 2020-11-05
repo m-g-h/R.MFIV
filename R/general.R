@@ -1,5 +1,4 @@
 #' Calculate descriptive variables fo a nest of option quotes
-#' \loadmathjax
 #' @inheritParams CBOE_F_0
 #' @inheritParams CBOE_option_selection
 #' @param price \code{numeric scalar} giving the underlying stock price.
@@ -7,7 +6,7 @@
 #' @return Returns a \code{list} with the following variables:
 #' \itemize{
 #'   \item {\strong{SD} (\code{numeric})}{- the Black Merton Scholes implied volatility for the at-the money call
-#'   (using \code{\link[fOptions]{GBSVolatility}})}
+#'   (using \code{GBSVolatility} from \code{fOptions})}
 #'   \item {\strong{max_K} (\code{numeric})}{ - highest strike price for out-of-the-money calls}
 #'   \item {\strong{min_K} (\code{numeric})}{ - lowest strike price for out-of-the-money puts}
 #'   \item {\strong{mean_delta_K} (\code{numeric})}{ - average distance between strike prices}

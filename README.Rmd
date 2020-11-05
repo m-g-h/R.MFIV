@@ -27,9 +27,11 @@ R.MFIV is currently in development
 The approach of the VIX calculation, which is replicated below, is explained in the [CBOE VIX Whitepaper](http://www.cboe.com/micro/vix/vixwhite.pdf).
 
 The VIX is defined as:
+
 ```{r echo=FALSE, out.width='45%', fig.align='center'}
 knitr::include_graphics("man/figures/VIX_formulas.PNG")
 ```
+
 where the term in brackets under the square root is a linear interpolation of two Implied Variances, which are given by the second formula.
 
 In order to calculate the VIX and its individual variables, this package provides the following functionality:
@@ -43,6 +45,9 @@ In order to calculate the VIX and its individual variables, this package provide
 7. Determine the Expiration Terms ("near-" and "next-term") `CBOE_interpolation_terms()`
 8. Interpolate the VIX using two Implied Variances `CBOE_VIX_index()`
 9. Calculate Option Descriptives `option_descriptives()`
+10. Display the data
+    - As single plot `pot_VIX()`
+    - In an interactive Shiny App `result_browser()`
 
 
 ## 1. Short Walkthrough 
@@ -53,7 +58,7 @@ data(option_dataset)
 option_dataset
 ```
 
-We select an exemplary entry as an example. This observation will be our "near-term" contract. Also note that the `option_quotes` are a "nested" data.table themselves.
+We select an exemplary entry as an example. This observation will be our "near-term" contract. Also note that `option_quotes` is a "nested" data.table itself
 ```{r}
 
 t <- option_dataset$t[4]
@@ -78,7 +83,8 @@ Calculate At-The-Money Forward Price F~0~
 ## Set expiration time to 4 PM
 exp <- exp + hours(16)
 ## Calculate maturity in years
-maturity <- time_length(exp-t,unit = "years")
+maturity <- time_length(exp-t,
+                        unit = "years")
 ## Calculate ATM Forward
 F_0 <- CBOE_F_0(option_quotes = option_quotes,
                 R = R,
@@ -88,7 +94,7 @@ F_0
 Calculate At-The-Money Strike price K~0~
 ```{r}
 K_0 <- CBOE_K_0(option_quotes = option_quotes,
-                                 F_0 = F_0)
+                F_0 = F_0)
 K_0
 ```
 
@@ -99,13 +105,13 @@ option_quotes <- CBOE_option_selection(option_quotes = option_quotes,
 option_quotes
 
 ```
-Calculate Implied Variance &sigma;^2^
+Optionally calculate the Implied Variance &sigma;^2^
 ```{r}
 sigma_sq <- CBOE_sigma_sq(sel_option_quotes = option_quotes,
-                       K_0 = K_0,
-                       F_0 = F_0,
-                       maturity = maturity,
-                       R = R)
+                          K_0 = K_0,
+                          F_0 = F_0,
+                          maturity = maturity,
+                          R = R)
 sigma_sq
 ```
 
@@ -118,8 +124,8 @@ option_quotes2 <- option_dataset$option_quotes[[5]]
 
 ## Risk free rate
 R2 <- interpolate_rfr(date = as_date(t2),
-                     exp = exp2,
-                     ret_table = F)
+                      exp = exp2,
+                      ret_table = F)
 
 ## Set expiration time to 4 PM
 exp2 <- exp2 + hours(16)
@@ -128,9 +134,9 @@ maturity2 <- time_length(exp2-t2,unit = "years")
 
 ## Calculate all VIX vars at once
 VIX_vars <- CBOE_VIX_vars(option_quotes = option_quotes2,
-              R = R2,
-              maturity = maturity2,
-              ret_vars = T)
+                          R = R2,
+                          maturity = maturity2,
+                          ret_vars = T)
 
 VIX_vars
 ```
@@ -179,7 +185,7 @@ option_dataset[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "
                  multicols(mapply(CBOE_VIX_vars,
                                   option_quotes, R, maturity,
                                   MoreArgs = list(ret_vars = T))
-                           )]
+                 )]
 option_dataset
 ```
 
@@ -210,4 +216,9 @@ VIX_data <- weekly[monthly, on = .(ticker, t)]
 
 VIX_data
 ```
+Display the data
+```{r}
+plot_VIX(VIX_data)
+```
 
+You can use `result_browser(VIX_data)` to display an interactive Shiny App that allows to browse through the results

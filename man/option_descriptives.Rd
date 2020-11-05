@@ -2,8 +2,7 @@
 % Please edit documentation in R/general.R
 \name{option_descriptives}
 \alias{option_descriptives}
-\title{Calculate descriptive variables fo a nest of option quotes
-\loadmathjax}
+\title{Calculate descriptive variables fo a nest of option quotes}
 \usage{
 option_descriptives(option_quotes, K_0, R, price, maturity)
 }
@@ -29,7 +28,7 @@ maturity \mjseqn{T} in decimal}
 Returns a \code{list} with the following variables:
 \itemize{
 \item {\strong{SD} (\code{numeric})}{- the Black Merton Scholes implied volatility for the at-the money call
-(using \code{\link[fOptions]{GBSVolatility}})}
+(using \code{GBSVolatility} from \code{fOptions})}
 \item {\strong{max_K} (\code{numeric})}{ - highest strike price for out-of-the-money calls}
 \item {\strong{min_K} (\code{numeric})}{ - lowest strike price for out-of-the-money puts}
 \item {\strong{mean_delta_K} (\code{numeric})}{ - average distance between strike prices}
@@ -39,7 +38,6 @@ Returns a \code{list} with the following variables:
 }
 \description{
 Calculate descriptive variables fo a nest of option quotes
-\loadmathjax
 }
 \examples{
 

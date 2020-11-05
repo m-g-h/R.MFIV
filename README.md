@@ -20,7 +20,9 @@ explained in the [CBOE VIX
 Whitepaper](http://www.cboe.com/micro/vix/vixwhite.pdf).
 
 The VIX is defined as:
+
 <img src="man/figures/VIX_formulas.PNG" width="45%" style="display: block; margin: auto;" />
+
 where the term in brackets under the square root is a linear
 interpolation of two Implied Variances, which are given by the second
 formula.
@@ -39,6 +41,9 @@ provides the following functionality:
     `CBOE_interpolation_terms()`
 8.  Interpolate the VIX using two Implied Variances `CBOE_VIX_index()`
 9.  Calculate Option Descriptives `option_descriptives()`
+10. Display the data
+      - As single plot `pot_VIX()`
+      - In an interactive Shiny App `result_browser()`
 
 ## 1\. Short Walkthrough
 
@@ -63,8 +68,8 @@ option_dataset
 ```
 
 We select an exemplary entry as an example. This observation will be our
-“near-term” contract. Also note that the `option_quotes` are a “nested”
-data.table themselves.
+“near-term” contract. Also note that `option_quotes` is a “nested”
+data.table itself
 
 ``` r
 
@@ -150,7 +155,8 @@ Calculate At-The-Money Forward Price F<sub>0</sub>
 ## Set expiration time to 4 PM
 exp <- exp + hours(16)
 ## Calculate maturity in years
-maturity <- time_length(exp-t,unit = "years")
+maturity <- time_length(exp-t,
+                        unit = "years")
 ## Calculate ATM Forward
 F_0 <- CBOE_F_0(option_quotes = option_quotes,
                 R = R,
@@ -163,7 +169,7 @@ Calculate At-The-Money Strike price K<sub>0</sub>
 
 ``` r
 K_0 <- CBOE_K_0(option_quotes = option_quotes,
-                                 F_0 = F_0)
+                F_0 = F_0)
 K_0
 #> [1] 147
 ```
@@ -213,14 +219,14 @@ option_quotes
 #>         K      c      p
 ```
 
-Calculate Implied Variance σ<sup>2</sup>
+Optionally calculate the Implied Variance σ<sup>2</sup>
 
 ``` r
 sigma_sq <- CBOE_sigma_sq(sel_option_quotes = option_quotes,
-                       K_0 = K_0,
-                       F_0 = F_0,
-                       maturity = maturity,
-                       R = R)
+                          K_0 = K_0,
+                          F_0 = F_0,
+                          maturity = maturity,
+                          R = R)
 sigma_sq
 #> [1] 0.05416683
 ```
@@ -236,8 +242,8 @@ option_quotes2 <- option_dataset$option_quotes[[5]]
 
 ## Risk free rate
 R2 <- interpolate_rfr(date = as_date(t2),
-                     exp = exp2,
-                     ret_table = F)
+                      exp = exp2,
+                      ret_table = F)
 
 ## Set expiration time to 4 PM
 exp2 <- exp2 + hours(16)
@@ -246,9 +252,9 @@ maturity2 <- time_length(exp2-t2,unit = "years")
 
 ## Calculate all VIX vars at once
 VIX_vars <- CBOE_VIX_vars(option_quotes = option_quotes2,
-              R = R2,
-              maturity = maturity2,
-              ret_vars = T)
+                          R = R2,
+                          maturity = maturity2,
+                          ret_vars = T)
 
 VIX_vars
 #> $F_0
@@ -312,6 +318,8 @@ option_descriptives(option_quotes = option_quotes,
 
 ## 2\. Processing a whole dataset (using data.table)
 
+Calculate the Implied Variances for a complete dataset
+
 ``` r
 ## Calculate risk-free-rate and maturity
 option_dataset[, `:=`(R = interpolate_rfr(date = as_date(t),
@@ -362,42 +370,60 @@ option_dataset[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "
                  multicols(mapply(CBOE_VIX_vars,
                                   option_quotes, R, maturity,
                                   MoreArgs = list(ret_vars = T))
-                           )]
+                 )]
 option_dataset
-#>        ticker                   t        exp   price       option_quotes
-#>     1:   AAAA 2017-06-13 09:31:00 2017-06-16 147.390  <data.table[96x3]>
-#>     2:   AAAA 2017-06-13 09:31:00 2017-06-23 147.390  <data.table[60x3]>
-#>     3:   AAAA 2017-06-13 09:31:00 2017-06-30 147.390  <data.table[53x3]>
-#>     4:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
-#>     5:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
-#>    ---                                                                  
-#> 12866:   BBBB 2017-06-13 16:00:00 2017-12-15 980.805  <data.table[91x3]>
-#> 12867:   BBBB 2017-06-13 16:00:00 2018-01-19 980.805 <data.table[139x3]>
-#> 12868:   BBBB 2017-06-13 16:00:00 2018-06-15 980.805  <data.table[71x3]>
-#> 12869:   BBBB 2017-06-13 16:00:00 2018-09-21 980.805  <data.table[65x3]>
-#> 12870:   BBBB 2017-06-13 16:00:00 2019-01-18 980.805 <data.table[117x3]>
-#>                  R    maturity   sigma_sq       F_0  K_0 n_put_raw n_call_raw
-#>     1: 0.008325593 0.008953152 0.11121384  147.4050  147        24          8
-#>     2: 0.008476933 0.028118108 0.07567317  147.4251  147        32         10
-#>     3: 0.008624972 0.047283063 0.06428081  147.4852  147        31         11
-#>     4: 0.008769736 0.066448019 0.05416683  147.5697  147        24         10
-#>     5: 0.008911253 0.085612974 0.05222205  147.5497  147        15         14
-#>    ---                                                                       
-#> 12866: 0.011223245 0.506502396 0.06804466  987.6685  980        57         31
-#> 12867: 0.011519671 0.602327173 0.06671541  989.1189  985        83         49
-#> 12868: 0.012206451 1.004791239 0.07255222  994.8624  980        41         26
-#> 12869: 0.012604115 1.273100616 0.07305354  999.3903  980        38         26
-#> 12870: 0.013144595 1.598904860 0.07445219 1005.3104 1000        66         50
-#>        n_put n_call
-#>     1:    24      8
-#>     2:    32     10
-#>     3:    31     11
-#>     4:    24     10
-#>     5:    15     14
-#>    ---             
-#> 12866:    56     31
-#> 12867:    81     49
-#> 12868:    41     26
-#> 12869:    38     26
-#> 12870:    66     50
 ```
+
+Determine the expiration terms for the interpolation. 1 indicates the
+near-term, 2 the next-term option.
+
+``` r
+## Weekly expiration terms
+option_dataset[, `:=`(term_wk = sapply(maturity, CBOE_interpolation_terms,
+                                       method = "weekly"),
+                      term_mn = mapply(CBOE_interpolation_terms,
+                                       maturity, as_date(t), as_date(exp),
+                                       MoreArgs = list(method = "monthly"))
+)]
+```
+
+Calculate the VIX indices
+
+``` r
+## Weekly VIX
+weekly <- option_dataset[!is.na(term_wk)][, .(VIX_wk = CBOE_VIX_index(maturity = maturity,
+                                                                      sigma_sq = sigma_sq)),
+                                          by = .(ticker, t)]
+
+## Monthly VIX
+monthly <- option_dataset[!is.na(term_mn)][, .(VIX_mn = CBOE_VIX_index(maturity = maturity,
+                                                                       sigma_sq = sigma_sq)),
+                                           by = .(ticker, t)]
+
+VIX_data <- weekly[monthly, on = .(ticker, t)]
+
+VIX_data
+#>      ticker                   t   VIX_wk   VIX_mn
+#>   1:   AAAA 2017-06-13 09:31:00 22.91347 21.45530
+#>   2:   AAAA 2017-06-13 09:32:00 22.84365 21.17519
+#>   3:   AAAA 2017-06-13 09:33:00 22.78820 21.13499
+#>   4:   AAAA 2017-06-13 09:34:00 22.75515 21.11951
+#>   5:   AAAA 2017-06-13 09:35:00 22.75988 21.05913
+#>  ---                                             
+#> 776:   BBBB 2017-06-13 15:56:00 21.46799 18.35661
+#> 777:   BBBB 2017-06-13 15:57:00 21.45854 18.36722
+#> 778:   BBBB 2017-06-13 15:58:00 21.44498 18.38045
+#> 779:   BBBB 2017-06-13 15:59:00 21.50976 18.45417
+#> 780:   BBBB 2017-06-13 16:00:00 21.60340 18.07499
+```
+
+Display the data
+
+``` r
+plot_VIX(VIX_data)
+```
+
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+
+You can use `result_browser(VIX_data)` to display an interactive Shiny
+App that allows to browse through the results
