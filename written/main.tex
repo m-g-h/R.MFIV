@@ -1,0 +1,38 @@
+%% PREAMBLE -------------------------------------------------------------------------------------
+\documentclass{article}
+
+\usepackage[pass,paperwidth=4in,paperheight=3.5in]{geometry}
+% TYPESETTING -----------------------------------------------------------------------------------
+\usepackage[utf8]{inputenc}						% utf8 for german nouns OE, AE and UE, else latin1
+\usepackage[T1]{fontenc}						% Correct Typeset
+\usepackage{lmodern}							% Latin Modern Typeset
+\usepackage{bbding}								% Fancy Symbols
+\usepackage[all]{nowidow} 						% google widows and orphans latex... 
+%\renewcommand*\familydefault{\sfdefault}		% Typeset without serifs
+\usepackage[activate={true,nocompatibility},
+tracking=true,	
+kerning=false]{microtype}			% Next-level typesetting
+
+% MATHS -----------------------------------------------------------------------------------------
+\usepackage{amsmath}							% Standard maths package
+\usepackage{amssymb}							% Fancy symbols and typesets (includes amsfonts)
+\usepackage{amstext}							% Allows text in formulas
+\usepackage{extarrows}							% fancy arrows
+\usepackage{bm}									% Fancy bold greeks \bm{math expression}
+\newcommand{\undset}[2]{\underset{\scriptscriptstyle #1}{#2\strut}}	
+% Correct height of different \undersets
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+\begin{equation*}
+	\sigma_{VIX} =  100 \sqrt{ \big( \omega T_1 \sigma_1^2 + (1- \omega) T_2 \sigma_2^2 \big) \frac{525,600}{43,200} }
+\end{equation*}
+
+
+\begin{equation*}
+	 \sigma^2_i = \frac{2}{T} \left(\sum_i \frac{\Delta K_i}{K_i^2} Q(K_i) e^{rT} \right) - \frac{1}{T} \left( \frac{F_0}{K_0} - 1 \right)^2
+\end{equation*}
+
+\end{document}
