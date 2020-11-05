@@ -152,6 +152,7 @@ option_descriptives(option_quotes = option_quotes,
 
 ## 2. Processing a whole dataset (using data.table)
 
+Calculate the Implied Variances for a complete dataset
 ```{r vix dataset example}
 ## Calculate risk-free-rate and maturity
 option_dataset[, `:=`(R = interpolate_rfr(date = as_date(t),
@@ -165,8 +166,7 @@ option_dataset
 
 If you want to keep the intermediate variables:
 
-
-```{r vix dataset example all vars}
+```{r vix dataset example all vars, eval=FALSE}
 var_names <- c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq")
 
 ## Function to convert the mapply result to a data.table
@@ -183,4 +183,31 @@ option_dataset[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "
 option_dataset
 ```
 
+Determine the expiration terms for the interpolation. 1 indicates the near-term, 2 the next-term option.
+```{r}
+## Weekly expiration terms
+option_dataset[, `:=`(term_wk = sapply(maturity, CBOE_interpolation_terms,
+                                       method = "weekly"),
+                      term_mn = mapply(CBOE_interpolation_terms,
+                                       maturity, as_date(t), as_date(exp),
+                                       MoreArgs = list(method = "monthly"))
+)]
+```
+
+Calculate the VIX indices
+```{r}
+## Weekly VIX
+weekly <- option_dataset[!is.na(term_wk)][, .(VIX_wk = CBOE_VIX_index(maturity = maturity,
+                                                                      sigma_sq = sigma_sq)),
+                                          by = .(ticker, t)]
+
+## Monthly VIX
+monthly <- option_dataset[!is.na(term_mn)][, .(VIX_mn = CBOE_VIX_index(maturity = maturity,
+                                                                       sigma_sq = sigma_sq)),
+                                           by = .(ticker, t)]
+
+VIX_data <- weekly[monthly, on = .(ticker, t)]
+
+VIX_data
+```
 
