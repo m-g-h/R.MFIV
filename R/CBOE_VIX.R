@@ -384,10 +384,15 @@ CBOE_VIX_index <- function(maturity, sigma_sq){
          crayon::red(". See "),
          crayon::blue("`help(CBOE_VIX_interpolation)`"))
   }
-  ## LINEAR INTERPOLATION
-  sigma_sq_30 <- stats::approx(x = maturity,
-                y = sigma_sq*maturity,
-                xout = 30/365)$y
+  ## LINEAR INTERPOLATION / Extrapolation
+
+  omega <- (maturity[2] - (30/365))/(maturity[2]- maturity[1])
+  sigma_sq_30 <- (omega * maturity[1] * sigma_sq[1]) + ((1-omega) * maturity[2] * sigma_sq[2])
+
+  ## approx doesn't support extrapolation!
+  # sigma_sq_30 <- stats::approx(x = maturity,
+  #               y = sigma_sq*maturity,
+  #               xout = 30/365)$y
 
   ## CALCULATE ANNUALISED STANDARD DEVIATION IN PERCENTAGE POINTS
   100 * sqrt(sigma_sq_30 * (365*24*60) / (30*24*60))

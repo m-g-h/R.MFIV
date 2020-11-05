@@ -273,8 +273,12 @@ test_that("CBOE_VIX_index() works", {
   testthat::expect_error(CBOE_VIX_index(maturity = c(1,2), sigma_sq = 1))
   testthat::expect_error(CBOE_VIX_index(maturity = 1, sigma_sq = 1))
 
-  ## NORMAL CALCULATION
+  ## NORMAL CALCULATION (INTRAPOLATION)
   testthat::expect_equal(CBOE_VIX_index(maturity = c(0.074, 0.09),
                        sigma_sq = c(0.3, 0.5)),
                        64.196962544967803)
+  ## NORMAL CALCULATION (EXTRAPOLATION)
+  testthat::expect_equal(CBOE_VIX_index(maturity = c(0.09, 0.12),
+                       sigma_sq = c(0.3, 0.5)),
+                       47.328638264796922)
 })
