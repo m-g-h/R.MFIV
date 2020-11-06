@@ -34,20 +34,34 @@ knitr::include_graphics("man/figures/VIX_formulas.PNG")
 
 where the term in brackets under the square root is a linear interpolation of two Implied Variances, which are given by the second formula.
 
-In order to calculate the VIX and its individual variables, this package provides the following functionality:
+In order to calculate the VIX and its individual variables, this package provides the following functionality as explained in the following sections
 
-1. Calculate the Risk-Free-Rate R `interpolate_rfr()`
-2. Calculate the At-The-Money Forward Price F~0~ `CBOE_F_O()`
-3. Calculate the At-The-Money Strike Price K~0~ `CBOE_K_0()`
-4. Select the Option Quotes Q(K~i~) according to the CBOE Rule `CBOE_option_selection()`
-5. Calculate the Implied Variance &sigma;^2^ `CBOE_sigma_sq()`
-6. Do all of the above in one function `CBOE_VIX_variables()`
-7. Determine the Expiration Terms ("near-" and "next-term") `CBOE_interpolation_terms()`
-8. Interpolate the VIX using two Implied Variances `CBOE_VIX_index()`
-9. Calculate Option Descriptives `option_descriptives()`
-10. Display the data
-    - As single plot `pot_VIX()`
-    - In an interactive Shiny App `result_browser()`
+*1. Short Walkthrough*
+
+- Calculate the Risk-Free-Rate R `interpolate_rfr()`
+- Calculate the At-The-Money Forward Price F~0~ `CBOE_F_O()`
+- Calculate the At-The-Money Strike Price K~0~ `CBOE_K_0()`
+- Select the Option Quotes Q(K~i~) according to the CBOE Rule `CBOE_option_selection()`
+- Calculate the Implied Variance &sigma;^2^ `CBOE_sigma_sq()`
+- Do all of the above in one function `CBOE_VIX_variables()`
+- Interpolate the VIX using two Implied Variances `CBOE_VIX_index()`
+- Calculate Option Descriptives `option_descriptives()`
+
+*2. Processing a whole dataset (using data.table)*
+
+- Create the implied Variance (and VIX variables) for a whole dataset
+- Automatically determine the Expiration Terms ("near-" and "next-term") `CBOE_interpolation_terms()`
+- Interpolate the weekly or monthly VIX index
+
+*3. Visualise the VIX-Index*
+
+- As single plot `plot_VIX()`
+- Browse through plots of multiple tickers with an interactive Shiny App `result_browser()`
+
+*4. Analyse the Option-Data Quality*
+
+- Calculate Option Descriptives for the whole dataset`option_descriptives()`
+- Visualise the option data quality [to be done]
 
 
 ## 1. Short Walkthrough 
@@ -170,34 +184,34 @@ option_dataset[, sigma_sq := mapply(CBOE_VIX_vars, option_quotes, R, maturity)]
 option_dataset
 ```
 
-If you want to keep the intermediate variables:
-
-```{r vix dataset example all vars, eval=FALSE}
-var_names <- c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq")
-
-## Function to convert the mapply result to a data.table
+Optionally, if you want to keep the intermediate variables:
+```{r}
+## This function converts the mapply results below to a data.table
 multicols <- function(matrix){
   data.table::as.data.table(t(matrix))[, lapply(.SD, unlist)]
 }
+```
 
+
+```{r vix dataset example all vars, eval=FALSE}
 ## Calculate VIX for the whole dataset, including intermediate variables
 option_dataset[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq") := 
                  multicols(mapply(CBOE_VIX_vars,
                                   option_quotes, R, maturity,
                                   MoreArgs = list(ret_vars = T))
                  )]
-option_dataset
 ```
 
 Determine the expiration terms for the interpolation. 1 indicates the near-term, 2 the next-term option.
 ```{r}
-## Weekly expiration terms
+## Weekly and monthly expiration terms
 option_dataset[, `:=`(term_wk = sapply(maturity, CBOE_interpolation_terms,
                                        method = "weekly"),
                       term_mn = mapply(CBOE_interpolation_terms,
                                        maturity, as_date(t), as_date(exp),
                                        MoreArgs = list(method = "monthly"))
 )]
+option_dataset
 ```
 
 Calculate the VIX indices
@@ -216,9 +230,30 @@ VIX_data <- weekly[monthly, on = .(ticker, t)]
 
 VIX_data
 ```
+## 3. Visualise the VIX-Index
+
 Display the data
 ```{r}
 plot_VIX(VIX_data)
 ```
 
-You can use `result_browser(VIX_data)` to display an interactive Shiny App that allows to browse through the results
+*You can use `result_browser(VIX_data)` to display an interactive Shiny App that allows to browse through the results*
+
+## 4. Analyse the Option-Data Quality
+Calculate descriptive variables for the option-data quality
+```{r}
+## Calculate F_0 and K_0 which are needed for the calculation
+option_dataset[, F_0 := mapply(CBOE_F_0,
+                               option_quotes, R, maturity)
+               ][, K_0 := mapply(CBOE_K_0,
+                               option_quotes, F_0)
+               ]
+
+## Calculate the option descriptves using the `multivols()` function from above
+option_dataset[, c("SD", "max_K", "min_K", "mean_delta_K", "n_put", "n_call") := 
+                 multicols(mapply(option_descriptives,
+                                  option_quotes, K_0, R, price, maturity)
+                 )]
+option_dataset
+```
+

@@ -146,8 +146,6 @@ CBOE_delta_K <- function(K){
     ret}
 }
 
-
-
 #' Calculate the CBOE VIX model free variance \mjseqn{\sigma^2}
 #'
 #' @description This function performs the CBOE VIX model-free implied variance calculation

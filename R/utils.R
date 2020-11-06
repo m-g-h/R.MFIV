@@ -25,5 +25,9 @@ utils::globalVariables(c(".",
                          "..cols",
                          "Variable",
                          "ticker",
-                         "value")
+                         "value",
+                         "IV",
+                         "TypeFlag",
+                         "x",
+                         "y")
 )

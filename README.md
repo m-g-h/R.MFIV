@@ -28,22 +28,32 @@ interpolation of two Implied Variances, which are given by the second
 formula.
 
 In order to calculate the VIX and its individual variables, this package
-provides the following functionality:
+provides the following functionality as explained in the following
+sections
 
-1.  Calculate the Risk-Free-Rate R `interpolate_rfr()`
-2.  Calculate the At-The-Money Forward Price F<sub>0</sub> `CBOE_F_O()`
-3.  Calculate the At-The-Money Strike Price K<sub>0</sub> `CBOE_K_0()`
-4.  Select the Option Quotes Q(K<sub>i</sub>) according to the CBOE Rule
-    `CBOE_option_selection()`
-5.  Calculate the Implied Variance σ<sup>2</sup> `CBOE_sigma_sq()`
-6.  Do all of the above in one function `CBOE_VIX_variables()`
-7.  Determine the Expiration Terms (“near-” and “next-term”)
-    `CBOE_interpolation_terms()`
-8.  Interpolate the VIX using two Implied Variances `CBOE_VIX_index()`
-9.  Calculate Option Descriptives `option_descriptives()`
-10. Display the data
-      - As single plot `pot_VIX()`
-      - In an interactive Shiny App `result_browser()`
+*1. Short Walkthrough* - Calculate the Risk-Free-Rate R
+`interpolate_rfr()` - Calculate the At-The-Money Forward Price
+F<sub>0</sub> `CBOE_F_O()` - Calculate the At-The-Money Strike Price
+K<sub>0</sub> `CBOE_K_0()` - Select the Option Quotes Q(K<sub>i</sub>)
+according to the CBOE Rule `CBOE_option_selection()` - Calculate the
+Implied Variance σ<sup>2</sup> `CBOE_sigma_sq()` - Do all of the above
+in one function `CBOE_VIX_variables()` - Interpolate the VIX using two
+Implied Variances `CBOE_VIX_index()` - Calculate Option Descriptives
+`option_descriptives()`
+
+*2. Processing a whole dataset (using data.table)* - Create the implied
+Variance (and VIX variables) for a whole dataset - Automatically
+determine the Expiration Terms (“near-” and “next-term”)
+`CBOE_interpolation_terms()` - Interpolate the weekly or monthly VIX
+index
+
+*3. Visualise the VIX-Index* - As single plot `plot_VIX()` - Browse
+through plots of multiple tickers with an interactive Shiny App
+`result_browser()`
+
+*4. Analyse the Option-Data Quality* - Calculate Option Descriptives for
+the whole dataset`option_descriptives()` - Visualise the option data
+quality \[to be done\]
 
 ## 1\. Short Walkthrough
 
@@ -358,12 +368,15 @@ option_dataset
 If you want to keep the intermediate variables:
 
 ``` r
-var_names <- c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq")
-
-## Function to convert the mapply result to a data.table
+## This function converts the mapply results below to a data.table
 multicols <- function(matrix){
   data.table::as.data.table(t(matrix))[, lapply(.SD, unlist)]
 }
+```
+
+``` r
+var_names <- c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq")
+
 
 ## Calculate VIX for the whole dataset, including intermediate variables
 option_dataset[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq") := 
@@ -378,7 +391,7 @@ Determine the expiration terms for the interpolation. 1 indicates the
 near-term, 2 the next-term option.
 
 ``` r
-## Weekly expiration terms
+## Weekly and monthly expiration terms
 option_dataset[, `:=`(term_wk = sapply(maturity, CBOE_interpolation_terms,
                                        method = "weekly"),
                       term_mn = mapply(CBOE_interpolation_terms,
@@ -417,13 +430,71 @@ VIX_data
 #> 780:   BBBB 2017-06-13 16:00:00 21.60340 18.07499
 ```
 
+## 3\. Visualise the VIX-Index
+
 Display the data
 
 ``` r
 plot_VIX(VIX_data)
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
-You can use `result_browser(VIX_data)` to display an interactive Shiny
-App that allows to browse through the results
+*You can use `result_browser(VIX_data)` to display an interactive Shiny
+App that allows to browse through the results*
+
+## 4\. Analyse the Option-Data Quality
+
+Calculate descriptive variables for the option-data quality
+
+``` r
+## Calculate F_0 and K_0 which are needed for the calculation
+option_dataset[, F_0 := mapply(CBOE_F_0,
+                               option_quotes, R, maturity)
+               ][, K_0 := mapply(CBOE_K_0,
+                               option_quotes, F_0)
+               ]
+
+## Calculate the option descriptves using the `multivols()` function from above
+option_dataset[, c("SD", "max_K", "min_K", "mean_delta_K", "n_put", "n_call") := 
+                 multicols(mapply(option_descriptives,
+                                  option_quotes, K_0, R, price, maturity)
+                 )]
+option_dataset
+#>        ticker                   t        exp   price       option_quotes
+#>     1:   AAAA 2017-06-13 09:31:00 2017-06-16 147.390  <data.table[96x3]>
+#>     2:   AAAA 2017-06-13 09:31:00 2017-06-23 147.390  <data.table[60x3]>
+#>     3:   AAAA 2017-06-13 09:31:00 2017-06-30 147.390  <data.table[53x3]>
+#>     4:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
+#>     5:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
+#>    ---                                                                  
+#> 12866:   BBBB 2017-06-13 16:00:00 2017-12-15 980.805  <data.table[91x3]>
+#> 12867:   BBBB 2017-06-13 16:00:00 2018-01-19 980.805 <data.table[139x3]>
+#> 12868:   BBBB 2017-06-13 16:00:00 2018-06-15 980.805  <data.table[71x3]>
+#> 12869:   BBBB 2017-06-13 16:00:00 2018-09-21 980.805  <data.table[65x3]>
+#> 12870:   BBBB 2017-06-13 16:00:00 2019-01-18 980.805 <data.table[117x3]>
+#>                  R    maturity   sigma_sq term_wk term_mn       F_0  K_0
+#>     1: 0.008325593 0.008953152 0.11121384      NA      NA  147.4050  147
+#>     2: 0.008476933 0.028118108 0.07567317      NA      NA  147.4251  147
+#>     3: 0.008624972 0.047283063 0.06428081      NA      NA  147.4852  147
+#>     4: 0.008769736 0.066448019 0.05416683       1      NA  147.5697  147
+#>     5: 0.008911253 0.085612974 0.05222205       2      NA  147.5497  147
+#>    ---                                                                  
+#> 12866: 0.011223245 0.506502396 0.06804466      NA      NA  987.6685  980
+#> 12867: 0.011519671 0.602327173 0.06671541      NA      NA  989.1189  985
+#> 12868: 0.012206451 1.004791239 0.07255222      NA      NA  994.8624  980
+#> 12869: 0.012604115 1.273100616 0.07305354      NA      NA  999.3903  980
+#> 12870: 0.013144595 1.598904860 0.07445219      NA      NA 1005.3104 1000
+#>               SD  max_K min_K mean_delta_K n_put n_call
+#>     1: 0.3029874  162.5   120     1.328125    24      8
+#>     2: 0.2516449  167.5   115     1.250000    32     10
+#>     3: 0.2352421  170.0   110     1.428571    31     11
+#>     4: 0.2218317  167.5   123     1.308824    24     10
+#>     5: 0.2189827  177.5   115     2.155172    15     14
+#>    ---                                                 
+#> 12866: 0.2667052 1400.0   460    10.681818    57     31
+#> 12867: 0.2633265 1400.0   240     8.787879    83     49
+#> 12868: 0.2827039 1500.0   450    15.671642    41     26
+#> 12869: 0.2900840 1500.0   480    15.937500    38     26
+#> 12870: 0.2948600 1500.0   365     9.784483    66     50
+```
