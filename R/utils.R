@@ -21,5 +21,9 @@ utils::globalVariables(c(".",
                          "delta_K",
                          "all_days",
                          "ind",
-                         "my")
+                         "my",
+                         "..cols",
+                         "Variable",
+                         "ticker",
+                         "value")
 )

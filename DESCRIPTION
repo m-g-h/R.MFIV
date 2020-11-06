@@ -24,7 +24,10 @@ Suggests:
     testthat (>= 2.1.0),
     covr,
     purrr,
-    dplyr
+    dplyr,
+    ggplot2,
+    plotly,
+    shiny
 RdMacros: mathjaxr
 Depends: 
     R (>= 2.10)
