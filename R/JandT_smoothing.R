@@ -16,7 +16,8 @@
 #' After application of this method, the returned option_quotes are spaced apart by
 #' \mjseqn{0.35} "SD Units", which translates into option price increments of
 #' \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}, where \mjseqn{SD}
-#' refers to a B&S implied volatility of the at-the-money option.
+#' refers to a B&S implied volatility of the at-the-money option. The range of the
+#' returned data spans \mjseqn{\pm 15} SD units.
 #'
 #' @inheritParams CBOE_F_0
 #' @inheritParams CBOE_K_0
@@ -89,8 +90,8 @@ JandT_2007_smoothing_method <- function(option_quotes,
 
   ## DETERMINE BOUNDS OF THE OPTION QUOTES SET
   K_1 <- exp(SD * sqrt(maturity) * -15) * F_0
-  K_2 <- IV_set[1, K]
-  K_N1 <- IV_set[.N, K]
+  K_2 <- center[1, x]
+  K_N1 <- center[.N, x]
   K_N <- exp(SD * sqrt(maturity) * 15) * F_0
 
   ## CALCULATE LEFT SLOPE
