@@ -266,7 +266,7 @@ CBOE_VIX_vars <- function(option_quotes, R, maturity,
   ## Stop if there are no puts or calls
   if(n_put == 0 | n_call == 0){
     warning(crayon::silver("NA "),
-            "returned. There wereno put / call quotes left in ",
+            "returned. There were no put / call quotes left in ",
             crayon::silver("`option_quotes`"),
             " after selecting by the CBOE rule.")
     return(NA)

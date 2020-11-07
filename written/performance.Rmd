@@ -1,0 +1,148 @@
+---
+title: "Performance"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tests for detemining which functions / packages are fastest
+
+Setup
+```{r}
+library(R.MFIV)
+library(purrr)
+library(future.apply)
+library(furrr)
+plan(multisession, workers = 4) ## Parallelize using four cores
+library(lubridate)
+library(microbenchmark)
+
+## This function converts the mapply results below to a data.table
+multicols <- function(matrix){
+  data.table::as.data.table(t(matrix))[, lapply(.SD, unlist)]
+}
+
+data <- data.table::copy(R.MFIV::option_dataset)
+
+data[, `:=`(maturity = time_length((exp + hours(16) - t),unit = "years"),
+            R = interpolate_rfr(date = as_date(t),
+                                exp = exp))]
+data
+```
+## `CBOE_F_0()`
+
+Compare `base` vs. `purrr` vs the `future` versions
+
+```{r}
+## base
+base_F_0 <- function(){
+  data[, .(F_0 = mapply(CBOE_F_0,
+                        option_quotes,
+                        R,
+                        maturity))]
+}
+## future.mapply
+future_F_0 <- function(){
+  data[, .(F_0 = future_mapply(CBOE_F_0,
+                               option_quotes,
+                               R,
+                               maturity))]
+}
+## purrr
+purrr_F_0 <- function(){
+  data[, .(F_0 = pmap_dbl(.l = list(option_quotes,
+                                    R,
+                                    maturity),
+                          .f = CBOE_F_0))]
+}
+
+## furrr
+furrr_F_0 <- function(){
+  data[, .(F_0 = future_pmap_dbl(.l = list(option_quotes,
+                                           R,
+                                           maturity),
+                                 .f = CBOE_F_0))]
+}
+
+microbenchmark(base_F_0(),
+               future_F_0(),
+               purrr_F_0(),
+               furrr_F_0(),
+               times = )
+```
+## `CBOE_VIX_vars()`
+
+Compare `base` vs. `purrr` vs the `future` versions
+
+```{r}
+## base
+base_VIX <- function(){
+  data[, .(sigma_sq = mapply(CBOE_VIX_vars, option_quotes, R, maturity))]
+}
+## future.mapply
+future_VIX <- function(){
+  data[, .(sigma_sq = future_mapply(CBOE_VIX_vars, option_quotes, R, maturity))]
+}
+## purrr
+purrr_VIX <- function(){
+  data[, .(F_0 = pmap_dbl(.l = list(option_quotes, R, maturity),
+                          .f = CBOE_VIX_vars))]
+}
+
+## furrr
+furrr_VIX <- function(){
+  data[, .(F_0 = future_pmap_dbl(.l = list(option_quotes, R, maturity),
+                                 .f = CBOE_VIX_vars))]
+}
+
+microbenchmark(base_VIX(),
+               future_VIX(),
+               purrr_VIX(),
+               furrr_VIX(),
+               times = 5)
+```
+## Short Fazit
+
+`future.apply` and `furrr` show the best performance, and the former is slightly faster.
+
+## `CBOE_VIX_vars()` with multiple column results
+
+Compare `furrr` vs the `future.apply` versions
+
+```{r}
+## future.mapply
+
+setupfun <- function(){
+  print("setup")
+  data2 <- data.table::copy(data)
+}
+
+data2 <- data.table::copy(data)
+data3 <- data.table::copy(data)
+
+future_VIX_full <- function(){
+  data2[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq") := 
+          multicols(future_mapply(CBOE_VIX_vars,
+                                  option_quotes, R, maturity,
+                                  MoreArgs = list(ret_vars = T))
+          )]
+  
+  
+}
+
+## furrr
+furrr_VIX_full <- function(){
+  data3[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq") := future_pmap_dfr(.l = list(option_quotes, R, maturity),
+                                        .f = CBOE_VIX_vars,
+                                        ret_vars = T)][]
+}
+
+microbenchmark(future_VIX_full(),
+               furrr_VIX_full(),
+               times = 1)
+```
+#Fazit
+
+`future.apply` is fastest
