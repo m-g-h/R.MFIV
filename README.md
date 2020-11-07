@@ -13,11 +13,7 @@ coverage](https://codecov.io/gh/m-g-h/R.MFIV/branch/master/graph/badge.svg)](htt
 
 R.MFIV is currently in development
 
-## CBOE VIX Calculation
-
-The approach of the VIX calculation, which is replicated below, is
-explained in the [CBOE VIX
-Whitepaper](http://www.cboe.com/micro/vix/vixwhite.pdf).
+## Package Functionality
 
 The VIX is defined as:
 
@@ -25,35 +21,47 @@ The VIX is defined as:
 
 where the term in brackets under the square root is a linear
 interpolation of two Implied Variances, which are given by the second
-formula.
+formula. The CBOE approach of the VIX calculation is explained in the
+[CBOE VIX Whitepaper](http://www.cboe.com/micro/vix/vixwhite.pdf).
 
 In order to calculate the VIX and its individual variables, this package
 provides the following functionality as explained in the following
 sections
 
-*1. Short Walkthrough* - Calculate the Risk-Free-Rate R
-`interpolate_rfr()` - Calculate the At-The-Money Forward Price
-F<sub>0</sub> `CBOE_F_O()` - Calculate the At-The-Money Strike Price
-K<sub>0</sub> `CBOE_K_0()` - Select the Option Quotes Q(K<sub>i</sub>)
-according to the CBOE Rule `CBOE_option_selection()` - Calculate the
-Implied Variance σ<sup>2</sup> `CBOE_sigma_sq()` - Do all of the above
-in one function `CBOE_VIX_variables()` - Interpolate the VIX using two
-Implied Variances `CBOE_VIX_index()` - Calculate Option Descriptives
-`option_descriptives()`
+**1. Short Walkthrough**
 
-*2. Processing a whole dataset (using data.table)* - Create the implied
-Variance (and VIX variables) for a whole dataset - Automatically
-determine the Expiration Terms (“near-” and “next-term”)
-`CBOE_interpolation_terms()` - Interpolate the weekly or monthly VIX
-index
+  - Calculate the *Risk-Free-Rate R* `interpolate_rfr()`
+  - Calculate the *At-The-Money Forward Price F<sub>0</sub>*
+    `CBOE_F_O()`
+  - Calculate the *At-The-Money Strike Price K<sub>0</sub>* `CBOE_K_0()`
+  - *Select* the Option Quotes Q(K<sub>i</sub>) according to the CBOE
+    Rule `CBOE_option_selection()`
+  - Calculate the *Implied Variance σ<sup>2</sup>* `CBOE_sigma_sq()`
+  - Do all of the above in one function `CBOE_VIX_variables()`
+  - Interpolate the **VIX** using two Implied Variances
+    `CBOE_VIX_index()`
+  - Calculate *Option Descriptives* `option_descriptives()`
 
-*3. Visualise the VIX-Index* - As single plot `plot_VIX()` - Browse
-through plots of multiple tickers with an interactive Shiny App
-`result_browser()`
+**2. Processing a whole dataset (using data.table)**
 
-*4. Analyse the Option-Data Quality* - Calculate Option Descriptives for
-the whole dataset`option_descriptives()` - Visualise the option data
-quality \[to be done\]
+  - Automatically determine the *Expiration Terms* (“near-” and
+    “next-term”) `CBOE_interpolation_terms()`
+  - Create the implied Variance (and VIX variables) for a whole dataset
+  - Interpolate the weekly or monthly VIX index
+
+**3. Visualise the VIX-Index**
+
+  - As single plot `plot_VIX()`
+  - Browse through plots of multiple tickers with an *interactive Shiny
+    App* `result_browser()`
+
+**4. Analyse the Option-Data Quality**
+
+  - Calculate Option Descriptives for the whole
+    dataset`option_descriptives()`
+  - Visualise the option data quality \[to be done\]
+
+**5. Improve Option-Data Quality using Smooting Methods**
 
 ## 1\. Short Walkthrough
 
@@ -326,46 +334,129 @@ option_descriptives(option_quotes = option_quotes,
 #> [1] 10
 ```
 
-## 2\. Processing a whole dataset (using data.table)
+## 2\. Processing a whole dataset (using `data.table` and `future.apply`)
+
+To speed up the calculations, we employ parallelised versions of the
+`apply` family. However, you can still use the standard ones.
+
+``` r
+library(future.apply)
+#> Warning: package 'future.apply' was built under R version 4.0.3
+#> Loading required package: future
+plan(multisession, workers = 4) ## Parallelize using four cores
+```
+
+Determine the expiration terms for the interpolation. 1 indicates the
+near-term, 2 the next-term option. We only keep those observations which
+are relevant for the weekly and monthly VIX calculation.
+
+``` r
+## Determine maturity
+option_dataset[, maturity := time_length((exp + hours(16) - t),unit = "years")]
+
+## Weekly and monthly expiration terms
+option_dataset[, `:=`(term_wk = future_sapply(maturity, CBOE_interpolation_terms,
+                                              method = "weekly"),
+                      term_mn = future_mapply(CBOE_interpolation_terms,
+                                              maturity, as_date(t), as_date(exp),
+                                              MoreArgs = list(method = "monthly"))
+)]
+#> Warning: UNRELIABLE VALUE: Future ('future_mapply-1') unexpectedly generated
+#> random numbers without specifying argument '[future.]seed'. There is a risk that
+#> those random numbers are not statistically sound and the overall results might
+#> be invalid. To fix this, specify argument '[future.]seed', e.g. 'seed=TRUE'.
+#> This ensures that proper, parallel-safe random numbers are produced via the
+#> L'Ecuyer-CMRG method. To disable this check, use [future].seed=NULL, or set
+#> option 'future.rng.onMisuse' to "ignore".
+#> Warning: UNRELIABLE VALUE: Future ('future_mapply-2') unexpectedly generated
+#> random numbers without specifying argument '[future.]seed'. There is a risk that
+#> those random numbers are not statistically sound and the overall results might
+#> be invalid. To fix this, specify argument '[future.]seed', e.g. 'seed=TRUE'.
+#> This ensures that proper, parallel-safe random numbers are produced via the
+#> L'Ecuyer-CMRG method. To disable this check, use [future].seed=NULL, or set
+#> option 'future.rng.onMisuse' to "ignore".
+#> Warning: UNRELIABLE VALUE: Future ('future_mapply-3') unexpectedly generated
+#> random numbers without specifying argument '[future.]seed'. There is a risk that
+#> those random numbers are not statistically sound and the overall results might
+#> be invalid. To fix this, specify argument '[future.]seed', e.g. 'seed=TRUE'.
+#> This ensures that proper, parallel-safe random numbers are produced via the
+#> L'Ecuyer-CMRG method. To disable this check, use [future].seed=NULL, or set
+#> option 'future.rng.onMisuse' to "ignore".
+#> Warning: UNRELIABLE VALUE: Future ('future_mapply-4') unexpectedly generated
+#> random numbers without specifying argument '[future.]seed'. There is a risk that
+#> those random numbers are not statistically sound and the overall results might
+#> be invalid. To fix this, specify argument '[future.]seed', e.g. 'seed=TRUE'.
+#> This ensures that proper, parallel-safe random numbers are produced via the
+#> L'Ecuyer-CMRG method. To disable this check, use [future].seed=NULL, or set
+#> option 'future.rng.onMisuse' to "ignore".
+## Select only options needed for the weekly and monthly VIX
+option_dataset <- option_dataset[!is.na(term_wk)
+                                 | !is.na(term_mn)]
+
+option_dataset
+#>       ticker                   t        exp   price       option_quotes
+#>    1:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
+#>    2:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
+#>    3:   AAAA 2017-06-13 09:31:00 2017-07-21 147.390  <data.table[42x3]>
+#>    4:   AAAA 2017-06-13 09:31:00 2017-08-18 147.390  <data.table[61x3]>
+#>    5:   AAAA 2017-06-13 09:32:00 2017-07-07 147.130  <data.table[51x3]>
+#>   ---                                                                  
+#> 3116:   BBBB 2017-06-13 15:59:00 2017-08-18 979.755  <data.table[92x3]>
+#> 3117:   BBBB 2017-06-13 16:00:00 2017-07-07 980.805  <data.table[99x3]>
+#> 3118:   BBBB 2017-06-13 16:00:00 2017-07-14 980.805  <data.table[65x3]>
+#> 3119:   BBBB 2017-06-13 16:00:00 2017-07-21 980.805 <data.table[121x3]>
+#> 3120:   BBBB 2017-06-13 16:00:00 2017-08-18 980.805  <data.table[92x3]>
+#>         maturity term_wk term_mn
+#>    1: 0.06644802       1      NA
+#>    2: 0.08561297       2      NA
+#>    3: 0.10477793      NA       1
+#>    4: 0.18143775      NA       2
+#>    5: 0.06644612       1      NA
+#>   ---                           
+#> 3116: 0.18070005      NA       2
+#> 3117: 0.06570842       1      NA
+#> 3118: 0.08487337       2      NA
+#> 3119: 0.10403833      NA       1
+#> 3120: 0.18069815      NA       2
+```
 
 Calculate the Implied Variances for a complete dataset
 
 ``` r
 ## Calculate risk-free-rate and maturity
 option_dataset[, `:=`(R = interpolate_rfr(date = as_date(t),
-                                          exp = exp),
-                      maturity = time_length((exp + hours(16) - t),unit = "years"))]
+                                          exp = exp))]
 
 ## Calculate VIX for the whole dataset
-option_dataset[, sigma_sq := mapply(CBOE_VIX_vars, option_quotes, R, maturity)]
+option_dataset[, sigma_sq := future_mapply(CBOE_VIX_vars, option_quotes, R, maturity)]
 option_dataset
-#>        ticker                   t        exp   price       option_quotes
-#>     1:   AAAA 2017-06-13 09:31:00 2017-06-16 147.390  <data.table[96x3]>
-#>     2:   AAAA 2017-06-13 09:31:00 2017-06-23 147.390  <data.table[60x3]>
-#>     3:   AAAA 2017-06-13 09:31:00 2017-06-30 147.390  <data.table[53x3]>
-#>     4:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
-#>     5:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
-#>    ---                                                                  
-#> 12866:   BBBB 2017-06-13 16:00:00 2017-12-15 980.805  <data.table[91x3]>
-#> 12867:   BBBB 2017-06-13 16:00:00 2018-01-19 980.805 <data.table[139x3]>
-#> 12868:   BBBB 2017-06-13 16:00:00 2018-06-15 980.805  <data.table[71x3]>
-#> 12869:   BBBB 2017-06-13 16:00:00 2018-09-21 980.805  <data.table[65x3]>
-#> 12870:   BBBB 2017-06-13 16:00:00 2019-01-18 980.805 <data.table[117x3]>
-#>                  R    maturity   sigma_sq
-#>     1: 0.008325593 0.008953152 0.11121384
-#>     2: 0.008476933 0.028118108 0.07567317
-#>     3: 0.008624972 0.047283063 0.06428081
-#>     4: 0.008769736 0.066448019 0.05416683
-#>     5: 0.008911253 0.085612974 0.05222205
-#>    ---                                   
-#> 12866: 0.011223245 0.506502396 0.06804466
-#> 12867: 0.011519671 0.602327173 0.06671541
-#> 12868: 0.012206451 1.004791239 0.07255222
-#> 12869: 0.012604115 1.273100616 0.07305354
-#> 12870: 0.013144595 1.598904860 0.07445219
+#>       ticker                   t        exp   price       option_quotes
+#>    1:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
+#>    2:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
+#>    3:   AAAA 2017-06-13 09:31:00 2017-07-21 147.390  <data.table[42x3]>
+#>    4:   AAAA 2017-06-13 09:31:00 2017-08-18 147.390  <data.table[61x3]>
+#>    5:   AAAA 2017-06-13 09:32:00 2017-07-07 147.130  <data.table[51x3]>
+#>   ---                                                                  
+#> 3116:   BBBB 2017-06-13 15:59:00 2017-08-18 979.755  <data.table[92x3]>
+#> 3117:   BBBB 2017-06-13 16:00:00 2017-07-07 980.805  <data.table[99x3]>
+#> 3118:   BBBB 2017-06-13 16:00:00 2017-07-14 980.805  <data.table[65x3]>
+#> 3119:   BBBB 2017-06-13 16:00:00 2017-07-21 980.805 <data.table[121x3]>
+#> 3120:   BBBB 2017-06-13 16:00:00 2017-08-18 980.805  <data.table[92x3]>
+#>         maturity term_wk term_mn           R   sigma_sq
+#>    1: 0.06644802       1      NA 0.008769736 0.05416683
+#>    2: 0.08561297       2      NA 0.008911253 0.05222205
+#>    3: 0.10477793      NA       1 0.009049549 0.05213150
+#>    4: 0.18143775      NA       2 0.009571069 0.06150820
+#>    5: 0.06644612       1      NA 0.008769736 0.05362052
+#>   ---                                                  
+#> 3116: 0.18070005      NA       2 0.009571069 0.07185948
+#> 3117: 0.06570842       1      NA 0.008769736 0.04598859
+#> 3118: 0.08487337       2      NA 0.008911253 0.04675662
+#> 3119: 0.10403833      NA       1 0.009049549 0.04784626
+#> 3120: 0.18069815      NA       2 0.009571069 0.07206823
 ```
 
-If you want to keep the intermediate variables:
+Optionally, if you want to keep the intermediate variables:
 
 ``` r
 ## This function converts the mapply results below to a data.table
@@ -375,29 +466,49 @@ multicols <- function(matrix){
 ```
 
 ``` r
-var_names <- c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq")
-
-
 ## Calculate VIX for the whole dataset, including intermediate variables
 option_dataset[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq") := 
-                 multicols(mapply(CBOE_VIX_vars,
-                                  option_quotes, R, maturity,
-                                  MoreArgs = list(ret_vars = T))
+                 multicols(future_mapply(CBOE_VIX_vars,
+                                         option_quotes, R, maturity,
+                                         MoreArgs = list(ret_vars = T))
                  )]
 option_dataset
-```
-
-Determine the expiration terms for the interpolation. 1 indicates the
-near-term, 2 the next-term option.
-
-``` r
-## Weekly and monthly expiration terms
-option_dataset[, `:=`(term_wk = sapply(maturity, CBOE_interpolation_terms,
-                                       method = "weekly"),
-                      term_mn = mapply(CBOE_interpolation_terms,
-                                       maturity, as_date(t), as_date(exp),
-                                       MoreArgs = list(method = "monthly"))
-)]
+#>       ticker                   t        exp   price       option_quotes
+#>    1:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
+#>    2:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
+#>    3:   AAAA 2017-06-13 09:31:00 2017-07-21 147.390  <data.table[42x3]>
+#>    4:   AAAA 2017-06-13 09:31:00 2017-08-18 147.390  <data.table[61x3]>
+#>    5:   AAAA 2017-06-13 09:32:00 2017-07-07 147.130  <data.table[51x3]>
+#>   ---                                                                  
+#> 3116:   BBBB 2017-06-13 15:59:00 2017-08-18 979.755  <data.table[92x3]>
+#> 3117:   BBBB 2017-06-13 16:00:00 2017-07-07 980.805  <data.table[99x3]>
+#> 3118:   BBBB 2017-06-13 16:00:00 2017-07-14 980.805  <data.table[65x3]>
+#> 3119:   BBBB 2017-06-13 16:00:00 2017-07-21 980.805 <data.table[121x3]>
+#> 3120:   BBBB 2017-06-13 16:00:00 2017-08-18 980.805  <data.table[92x3]>
+#>         maturity term_wk term_mn           R   sigma_sq      F_0 K_0 n_put_raw
+#>    1: 0.06644802       1      NA 0.008769736 0.05416683 147.5697 147        24
+#>    2: 0.08561297       2      NA 0.008911253 0.05222205 147.5497 147        15
+#>    3: 0.10477793      NA       1 0.009049549 0.05213150 147.5927 145         8
+#>    4: 0.18143775      NA       2 0.009571069 0.06150820 147.4042 145         9
+#>    5: 0.06644612       1      NA 0.008769736 0.05362052 147.2551 147        24
+#>   ---                                                                         
+#> 3116: 0.18070005      NA       2 0.009571069 0.07185948 982.6045 980        52
+#> 3117: 0.06570842       1      NA 0.008769736 0.04598859 981.3243 980        43
+#> 3118: 0.08487337       2      NA 0.008911253 0.04675662 982.0747 980        25
+#> 3119: 0.10403833      NA       1 0.009049549 0.04784626 982.4523 980        50
+#> 3120: 0.18069815      NA       2 0.009571069 0.07206823 983.2470 980        52
+#>       n_call_raw n_put n_call
+#>    1:         10    24     10
+#>    2:         14    15     14
+#>    3:          9     8      9
+#>    4:         11     9     11
+#>    5:         10    24     10
+#>   ---                        
+#> 3116:         38    52     38
+#> 3117:         52    43     52
+#> 3118:         34    25     34
+#> 3119:         22    47     22
+#> 3120:         38    52     38
 ```
 
 Calculate the VIX indices
@@ -438,63 +549,136 @@ Display the data
 plot_VIX(VIX_data)
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
-*You can use `result_browser(VIX_data)` to display an interactive Shiny
-App that allows to browse through the results*
+**You can use `result_browser(VIX_data)` to display an interactive Shiny
+App that allows to browse through the results**
 
 ## 4\. Analyse the Option-Data Quality
 
 Calculate descriptive variables for the option-data quality
 
 ``` r
-## Calculate F_0 and K_0 which are needed for the calculation
-option_dataset[, F_0 := mapply(CBOE_F_0,
-                               option_quotes, R, maturity)
-               ][, K_0 := mapply(CBOE_K_0,
-                               option_quotes, F_0)
-               ]
-
-## Calculate the option descriptves using the `multivols()` function from above
+## Calculate the option descriptives using the `multicols()` function from above
 option_dataset[, c("SD", "max_K", "min_K", "mean_delta_K", "n_put", "n_call") := 
-                 multicols(mapply(option_descriptives,
-                                  option_quotes, K_0, R, price, maturity)
+                 multicols(future_mapply(option_descriptives,
+                                         option_quotes, K_0, R, price, maturity)
                  )]
 option_dataset
-#>        ticker                   t        exp   price       option_quotes
-#>     1:   AAAA 2017-06-13 09:31:00 2017-06-16 147.390  <data.table[96x3]>
-#>     2:   AAAA 2017-06-13 09:31:00 2017-06-23 147.390  <data.table[60x3]>
-#>     3:   AAAA 2017-06-13 09:31:00 2017-06-30 147.390  <data.table[53x3]>
-#>     4:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
-#>     5:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
-#>    ---                                                                  
-#> 12866:   BBBB 2017-06-13 16:00:00 2017-12-15 980.805  <data.table[91x3]>
-#> 12867:   BBBB 2017-06-13 16:00:00 2018-01-19 980.805 <data.table[139x3]>
-#> 12868:   BBBB 2017-06-13 16:00:00 2018-06-15 980.805  <data.table[71x3]>
-#> 12869:   BBBB 2017-06-13 16:00:00 2018-09-21 980.805  <data.table[65x3]>
-#> 12870:   BBBB 2017-06-13 16:00:00 2019-01-18 980.805 <data.table[117x3]>
-#>                  R    maturity   sigma_sq term_wk term_mn       F_0  K_0
-#>     1: 0.008325593 0.008953152 0.11121384      NA      NA  147.4050  147
-#>     2: 0.008476933 0.028118108 0.07567317      NA      NA  147.4251  147
-#>     3: 0.008624972 0.047283063 0.06428081      NA      NA  147.4852  147
-#>     4: 0.008769736 0.066448019 0.05416683       1      NA  147.5697  147
-#>     5: 0.008911253 0.085612974 0.05222205       2      NA  147.5497  147
-#>    ---                                                                  
-#> 12866: 0.011223245 0.506502396 0.06804466      NA      NA  987.6685  980
-#> 12867: 0.011519671 0.602327173 0.06671541      NA      NA  989.1189  985
-#> 12868: 0.012206451 1.004791239 0.07255222      NA      NA  994.8624  980
-#> 12869: 0.012604115 1.273100616 0.07305354      NA      NA  999.3903  980
-#> 12870: 0.013144595 1.598904860 0.07445219      NA      NA 1005.3104 1000
-#>               SD  max_K min_K mean_delta_K n_put n_call
-#>     1: 0.3029874  162.5   120     1.328125    24      8
-#>     2: 0.2516449  167.5   115     1.250000    32     10
-#>     3: 0.2352421  170.0   110     1.428571    31     11
-#>     4: 0.2218317  167.5   123     1.308824    24     10
-#>     5: 0.2189827  177.5   115     2.155172    15     14
-#>    ---                                                 
-#> 12866: 0.2667052 1400.0   460    10.681818    57     31
-#> 12867: 0.2633265 1400.0   240     8.787879    83     49
-#> 12868: 0.2827039 1500.0   450    15.671642    41     26
-#> 12869: 0.2900840 1500.0   480    15.937500    38     26
-#> 12870: 0.2948600 1500.0   365     9.784483    66     50
+#>       ticker                   t        exp   price       option_quotes
+#>    1:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
+#>    2:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
+#>    3:   AAAA 2017-06-13 09:31:00 2017-07-21 147.390  <data.table[42x3]>
+#>    4:   AAAA 2017-06-13 09:31:00 2017-08-18 147.390  <data.table[61x3]>
+#>    5:   AAAA 2017-06-13 09:32:00 2017-07-07 147.130  <data.table[51x3]>
+#>   ---                                                                  
+#> 3116:   BBBB 2017-06-13 15:59:00 2017-08-18 979.755  <data.table[92x3]>
+#> 3117:   BBBB 2017-06-13 16:00:00 2017-07-07 980.805  <data.table[99x3]>
+#> 3118:   BBBB 2017-06-13 16:00:00 2017-07-14 980.805  <data.table[65x3]>
+#> 3119:   BBBB 2017-06-13 16:00:00 2017-07-21 980.805 <data.table[121x3]>
+#> 3120:   BBBB 2017-06-13 16:00:00 2017-08-18 980.805  <data.table[92x3]>
+#>         maturity term_wk term_mn           R   sigma_sq      F_0 K_0 n_put_raw
+#>    1: 0.06644802       1      NA 0.008769736 0.05416683 147.5697 147        24
+#>    2: 0.08561297       2      NA 0.008911253 0.05222205 147.5497 147        15
+#>    3: 0.10477793      NA       1 0.009049549 0.05213150 147.5927 145         8
+#>    4: 0.18143775      NA       2 0.009571069 0.06150820 147.4042 145         9
+#>    5: 0.06644612       1      NA 0.008769736 0.05362052 147.2551 147        24
+#>   ---                                                                         
+#> 3116: 0.18070005      NA       2 0.009571069 0.07185948 982.6045 980        52
+#> 3117: 0.06570842       1      NA 0.008769736 0.04598859 981.3243 980        43
+#> 3118: 0.08487337       2      NA 0.008911253 0.04675662 982.0747 980        25
+#> 3119: 0.10403833      NA       1 0.009049549 0.04784626 982.4523 980        50
+#> 3120: 0.18069815      NA       2 0.009571069 0.07206823 983.2470 980        52
+#>       n_call_raw n_put n_call        SD  max_K min_K mean_delta_K
+#>    1:         10    24     10 0.2218317  167.5   123     1.308824
+#>    2:         14    15     14 0.2189827  177.5   115     2.155172
+#>    3:          9     8      9 0.2196033  190.0   100     5.294118
+#>    4:         11     9     11 0.2395117  200.0   100     5.000000
+#>    5:         10    24     10 0.2208317  167.5   123     1.308824
+#>   ---                                                            
+#> 3116:         38    52     38 0.2695806 1400.0   720     7.555556
+#> 3117:         52    43     52 0.2037625 1140.0   790     3.684211
+#> 3118:         34    25     34 0.2050042 1130.0   800     5.593220
+#> 3119:         22    50     22 0.2152011 1200.0   650     7.638889
+#> 3120:         38    52     38 0.2670286 1400.0   720     7.555556
+```
+
+## 5\. Improve Option-Data Quality using Smooting Methods
+
+``` r
+## Use the Jiang & Tian (2007) smoothing method to fill in and extrapolate the option quotes.
+option_dataset[, option_quotes_smooth := future_mapply(JandT_2007_smoothing_method,
+                                                       option_quotes, K_0, price, R, maturity, F_0,
+                                                       SIMPLIFY = F)]
+
+option_dataset
+#>       ticker                   t        exp   price       option_quotes
+#>    1:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
+#>    2:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
+#>    3:   AAAA 2017-06-13 09:31:00 2017-07-21 147.390  <data.table[42x3]>
+#>    4:   AAAA 2017-06-13 09:31:00 2017-08-18 147.390  <data.table[61x3]>
+#>    5:   AAAA 2017-06-13 09:32:00 2017-07-07 147.130  <data.table[51x3]>
+#>   ---                                                                  
+#> 3116:   BBBB 2017-06-13 15:59:00 2017-08-18 979.755  <data.table[92x3]>
+#> 3117:   BBBB 2017-06-13 16:00:00 2017-07-07 980.805  <data.table[99x3]>
+#> 3118:   BBBB 2017-06-13 16:00:00 2017-07-14 980.805  <data.table[65x3]>
+#> 3119:   BBBB 2017-06-13 16:00:00 2017-07-21 980.805 <data.table[121x3]>
+#> 3120:   BBBB 2017-06-13 16:00:00 2017-08-18 980.805  <data.table[92x3]>
+#>         maturity term_wk term_mn           R   sigma_sq      F_0 K_0 n_put_raw
+#>    1: 0.06644802       1      NA 0.008769736 0.05416683 147.5697 147        24
+#>    2: 0.08561297       2      NA 0.008911253 0.05222205 147.5497 147        15
+#>    3: 0.10477793      NA       1 0.009049549 0.05213150 147.5927 145         8
+#>    4: 0.18143775      NA       2 0.009571069 0.06150820 147.4042 145         9
+#>    5: 0.06644612       1      NA 0.008769736 0.05362052 147.2551 147        24
+#>   ---                                                                         
+#> 3116: 0.18070005      NA       2 0.009571069 0.07185948 982.6045 980        52
+#> 3117: 0.06570842       1      NA 0.008769736 0.04598859 981.3243 980        43
+#> 3118: 0.08487337       2      NA 0.008911253 0.04675662 982.0747 980        25
+#> 3119: 0.10403833      NA       1 0.009049549 0.04784626 982.4523 980        50
+#> 3120: 0.18069815      NA       2 0.009571069 0.07206823 983.2470 980        52
+#>       n_call_raw n_put n_call        SD  max_K min_K mean_delta_K
+#>    1:         10    24     10 0.2218317  167.5   123     1.308824
+#>    2:         14    15     14 0.2189827  177.5   115     2.155172
+#>    3:          9     8      9 0.2196033  190.0   100     5.294118
+#>    4:         11     9     11 0.2395117  200.0   100     5.000000
+#>    5:         10    24     10 0.2208317  167.5   123     1.308824
+#>   ---                                                            
+#> 3116:         38    52     38 0.2695806 1400.0   720     7.555556
+#> 3117:         52    43     52 0.2037625 1140.0   790     3.684211
+#> 3118:         34    25     34 0.2050042 1130.0   800     5.593220
+#> 3119:         22    50     22 0.2152011 1200.0   650     7.638889
+#> 3120:         38    52     38 0.2670286 1400.0   720     7.555556
+#>       option_quotes_smooth
+#>    1:   <data.table[98x2]>
+#>    2:  <data.table[112x2]>
+#>    3:  <data.table[133x2]>
+#>    4:  <data.table[149x2]>
+#>    5:  <data.table[142x2]>
+#>   ---                     
+#> 3116:  <data.table[134x2]>
+#> 3117:  <data.table[100x2]>
+#> 3118:  <data.table[101x2]>
+#> 3119:  <data.table[102x2]>
+#> 3120:  <data.table[133x2]>
+```
+
+Let’s look at one nest of smoothed `option_quotes`
+
+``` r
+## Calculate the option descriptives using the `multicols()` function from above
+smooth_quotes <- option_dataset$option_quotes_smooth[[1]]
+
+min(smooth_quotes$K)
+#> [1] 63
+max(smooth_quotes$K)
+#> [1] 356.5
+length(smooth_quotes$K)
+#> [1] 98
+## Average spacing in price units
+mean(smooth_quotes$K - data.table::shift(smooth_quotes$K), na.rm = T)
+#> [1] 3.025773
+
+## Spacing in SD units
+3 / (option_dataset$SD[[1]] * option_dataset$price[[1]] * sqrt(option_dataset$maturity[[1]]))
+#> [1] 0.3559497
 ```

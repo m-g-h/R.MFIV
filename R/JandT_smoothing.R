@@ -1,7 +1,22 @@
-#' Extend and fill in the option quotes using Jiang & Tian (2007) Implied Volatility Curve Fitting
+#' Extend and fill in the option quotes using Jiang & Tian (2005, 2007)
+#' Implied Volatility Curve Fitting
 #' \loadmathjax
 #'
-#' \mjseqn{test}
+#' @details
+#' The CBOE VIX calculation method relies on a wide option quotes over the range of
+#' strike prices. However, the actual data might not yield enough option quotes. If
+#' the quotes are spaced apart too far and have a limited range over the strike prices,
+#' this introduces errors (see Jiang & Tian (2005, 2007)).
+#'
+#' Jiang & Tian (2005, 2007) also propose a smoothing method: option quotes are
+#' transformed in to Black \& Scholes implied volatilities, intra- and extrapolated,
+#' an then transformed back into option prices. This methodology is provided by this
+#' function.
+#'
+#' After application of this method, the returned option_quotes are spaced apart by
+#' \mjseqn{0.35} "SD Units", which translates into option price increments of
+#' \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}, where \mjseqn{SD}
+#' refers to a B&S implied volatility of the at-the-money option.
 #'
 #' @inheritParams CBOE_F_0
 #' @inheritParams CBOE_K_0
@@ -14,6 +29,15 @@
 #'   \item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
 #'   \item {\strong{Q} (\code{numeric})}{ - OTM option}
 #' }
+#'
+#' @references
+#' \href{https://doi.org/10.1093/RFS%2FHHI027}{Jiang & Tian (2005) -
+#' The Model-Free Implied Volatility and Its Information Content}
+#'
+#' \href{https://doi.org/10.3905/jod.2007.681813}{Jiang & Tian (2007) -
+#'  Extracting Model-Free Volatility
+#' from Option Prices: An Examination of the VIX Index}
+#'
 #' @export
 #'
 #' @examples
@@ -24,12 +48,12 @@
 #' nest <- option_dataset$option_quotes[[1]]
 #'
 #' ## EXTRAPOLATE DATA
-#' extra_data <- JandT_2007_smoothing_method(option_quotes = nest,
-#'                                           maturity = 0.008953152,
-#'                                           K_0 = 147,
-#'                                           price = 147.39,
-#'                                           R = 0.008325593,
-#'                                           F_0 = 147.405)
+#' JandT_2007_smoothing_method(option_quotes = nest,
+#'                             maturity = 0.008953152,
+#'                             K_0 = 147,
+#'                             price = 147.39,
+#'                             R = 0.008325593,
+#'                             F_0 = 147.405)
 #'
 JandT_2007_smoothing_method <- function(option_quotes,
                                         K_0, price, R, maturity, F_0){

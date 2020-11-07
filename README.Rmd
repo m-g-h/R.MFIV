@@ -22,9 +22,7 @@ knitr::opts_chunk$set(
 
 R.MFIV is currently in development
 
-## CBOE VIX Calculation
-
-The approach of the VIX calculation, which is replicated below, is explained in the [CBOE VIX Whitepaper](http://www.cboe.com/micro/vix/vixwhite.pdf).
+## Package Functionality
 
 The VIX is defined as:
 
@@ -32,36 +30,40 @@ The VIX is defined as:
 knitr::include_graphics("man/figures/VIX_formulas.PNG")
 ```
 
-where the term in brackets under the square root is a linear interpolation of two Implied Variances, which are given by the second formula.
+where the term in brackets under the square root is a linear interpolation of two Implied Variances, which are given by the second formula. The CBOE approach of the VIX calculation is explained in the [CBOE VIX Whitepaper](http://www.cboe.com/micro/vix/vixwhite.pdf).
 
 In order to calculate the VIX and its individual variables, this package provides the following functionality as explained in the following sections
 
-*1. Short Walkthrough*
+**1. Short Walkthrough**
 
-- Calculate the Risk-Free-Rate R `interpolate_rfr()`
-- Calculate the At-The-Money Forward Price F~0~ `CBOE_F_O()`
-- Calculate the At-The-Money Strike Price K~0~ `CBOE_K_0()`
-- Select the Option Quotes Q(K~i~) according to the CBOE Rule `CBOE_option_selection()`
-- Calculate the Implied Variance &sigma;^2^ `CBOE_sigma_sq()`
+- Calculate the *Risk-Free-Rate R* `interpolate_rfr()`
+- Calculate the *At-The-Money Forward Price F~0~* `CBOE_F_O()`
+- Calculate the *At-The-Money Strike Price K~0~* `CBOE_K_0()`
+- *Select* the Option Quotes Q(K~i~) according to the CBOE Rule `CBOE_option_selection()`
+- Calculate the *Implied Variance &sigma;^2^* `CBOE_sigma_sq()`
 - Do all of the above in one function `CBOE_VIX_variables()`
-- Interpolate the VIX using two Implied Variances `CBOE_VIX_index()`
-- Calculate Option Descriptives `option_descriptives()`
+- Interpolate the **VIX** using two Implied Variances `CBOE_VIX_index()`
+- Calculate *Option Descriptives* `option_descriptives()`
 
-*2. Processing a whole dataset (using data.table)*
+**2. Processing a whole dataset (using data.table)**
 
+- Automatically determine the *Expiration Terms* ("near-" and "next-term") `CBOE_interpolation_terms()`
 - Create the implied Variance (and VIX variables) for a whole dataset
-- Automatically determine the Expiration Terms ("near-" and "next-term") `CBOE_interpolation_terms()`
 - Interpolate the weekly or monthly VIX index
 
-*3. Visualise the VIX-Index*
+**3. Visualise the VIX-Index**
 
 - As single plot `plot_VIX()`
-- Browse through plots of multiple tickers with an interactive Shiny App `result_browser()`
+- Browse through plots of multiple tickers with an *interactive Shiny App* `result_browser()`
 
-*4. Analyse the Option-Data Quality*
+**4. Analyse the Option-Data Quality**
 
 - Calculate Option Descriptives for the whole dataset`option_descriptives()`
 - Visualise the option data quality [to be done]
+
+**5. Improve Option-Data Quality using Smooting Methods**
+
+
 
 
 ## 1. Short Walkthrough 
@@ -170,17 +172,42 @@ option_descriptives(option_quotes = option_quotes,
                     maturity = maturity)
 ```
 
-## 2. Processing a whole dataset (using data.table)
+## 2. Processing a whole dataset (using `data.table` and `future.apply`)
+
+To speed up the calculations, we employ parallelised versions of the `apply` family. However, you can still use the standard ones.
+```{r}
+library(future.apply)
+plan(multisession, workers = 4) ## Parallelize using four cores
+```
+
+
+Determine the expiration terms for the interpolation. 1 indicates the near-term, 2 the next-term option. We only keep those observations which are relevant for the weekly and monthly VIX calculation.
+```{r}
+## Determine maturity
+option_dataset[, maturity := time_length((exp + hours(16) - t),unit = "years")]
+
+## Weekly and monthly expiration terms
+option_dataset[, `:=`(term_wk = future_sapply(maturity, CBOE_interpolation_terms,
+                                              method = "weekly"),
+                      term_mn = future_mapply(CBOE_interpolation_terms,
+                                              maturity, as_date(t), as_date(exp),
+                                              MoreArgs = list(method = "monthly"))
+)]
+## Select only options needed for the weekly and monthly VIX
+option_dataset <- option_dataset[!is.na(term_wk)
+                                 | !is.na(term_mn)]
+
+option_dataset
+```
 
 Calculate the Implied Variances for a complete dataset
 ```{r vix dataset example}
 ## Calculate risk-free-rate and maturity
 option_dataset[, `:=`(R = interpolate_rfr(date = as_date(t),
-                                          exp = exp),
-                      maturity = time_length((exp + hours(16) - t),unit = "years"))]
+                                          exp = exp))]
 
 ## Calculate VIX for the whole dataset
-option_dataset[, sigma_sq := mapply(CBOE_VIX_vars, option_quotes, R, maturity)]
+option_dataset[, sigma_sq := future_mapply(CBOE_VIX_vars, option_quotes, R, maturity)]
 option_dataset
 ```
 
@@ -193,26 +220,17 @@ multicols <- function(matrix){
 ```
 
 
-```{r vix dataset example all vars, eval=FALSE}
+```{r vix dataset example all vars}
 ## Calculate VIX for the whole dataset, including intermediate variables
 option_dataset[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq") := 
-                 multicols(mapply(CBOE_VIX_vars,
-                                  option_quotes, R, maturity,
-                                  MoreArgs = list(ret_vars = T))
+                 multicols(future_mapply(CBOE_VIX_vars,
+                                         option_quotes, R, maturity,
+                                         MoreArgs = list(ret_vars = T))
                  )]
-```
-
-Determine the expiration terms for the interpolation. 1 indicates the near-term, 2 the next-term option.
-```{r}
-## Weekly and monthly expiration terms
-option_dataset[, `:=`(term_wk = sapply(maturity, CBOE_interpolation_terms,
-                                       method = "weekly"),
-                      term_mn = mapply(CBOE_interpolation_terms,
-                                       maturity, as_date(t), as_date(exp),
-                                       MoreArgs = list(method = "monthly"))
-)]
 option_dataset
 ```
+
+
 
 Calculate the VIX indices
 ```{r}
@@ -237,23 +255,40 @@ Display the data
 plot_VIX(VIX_data)
 ```
 
-*You can use `result_browser(VIX_data)` to display an interactive Shiny App that allows to browse through the results*
+**You can use `result_browser(VIX_data)` to display an interactive Shiny App that allows to browse through the results**
 
 ## 4. Analyse the Option-Data Quality
 Calculate descriptive variables for the option-data quality
 ```{r}
-## Calculate F_0 and K_0 which are needed for the calculation
-option_dataset[, F_0 := mapply(CBOE_F_0,
-                               option_quotes, R, maturity)
-               ][, K_0 := mapply(CBOE_K_0,
-                               option_quotes, F_0)
-               ]
-
-## Calculate the option descriptves using the `multivols()` function from above
+## Calculate the option descriptives using the `multicols()` function from above
 option_dataset[, c("SD", "max_K", "min_K", "mean_delta_K", "n_put", "n_call") := 
-                 multicols(mapply(option_descriptives,
-                                  option_quotes, K_0, R, price, maturity)
+                 multicols(future_mapply(option_descriptives,
+                                         option_quotes, K_0, R, price, maturity)
                  )]
 option_dataset
+```
+
+## 5. Improve Option-Data Quality using Smooting Methods
+```{r}
+## Use the Jiang & Tian (2007) smoothing method to fill in and extrapolate the option quotes.
+option_dataset[, option_quotes_smooth := future_mapply(JandT_2007_smoothing_method,
+                                                       option_quotes, K_0, price, R, maturity, F_0,
+                                                       SIMPLIFY = F)]
+
+option_dataset
+```
+Let's look at one nest of smoothed `option_quotes`
+```{r}
+## Calculate the option descriptives using the `multicols()` function from above
+smooth_quotes <- option_dataset$option_quotes_smooth[[1]]
+
+min(smooth_quotes$K)
+max(smooth_quotes$K)
+length(smooth_quotes$K)
+## Average spacing in price units
+mean(smooth_quotes$K - data.table::shift(smooth_quotes$K), na.rm = T)
+
+## Spacing in SD units
+3 / (option_dataset$SD[[1]] * option_dataset$price[[1]] * sqrt(option_dataset$maturity[[1]]))
 ```
 
