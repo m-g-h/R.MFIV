@@ -188,10 +188,12 @@ option_dataset[, maturity := time_length((exp + hours(16) - t),unit = "years")]
 
 ## Weekly and monthly expiration terms
 option_dataset[, `:=`(term_wk = future_sapply(maturity, CBOE_interpolation_terms,
-                                              method = "weekly"),
+                                              method = "weekly",
+                                              future.seed = 1337),
                       term_mn = future_mapply(CBOE_interpolation_terms,
                                               maturity, as_date(t), as_date(exp),
-                                              MoreArgs = list(method = "monthly"))
+                                              MoreArgs = list(method = "monthly"),
+                                              future.seed = 1337)
 )]
 ## Select only options needed for the weekly and monthly VIX
 option_dataset <- option_dataset[!is.na(term_wk)
@@ -206,8 +208,9 @@ Calculate the Implied Variances for a complete dataset
 option_dataset[, `:=`(R = interpolate_rfr(date = as_date(t),
                                           exp = exp))]
 
-## Calculate VIX for the whole dataset
-option_dataset[, sigma_sq := future_mapply(CBOE_VIX_vars, option_quotes, R, maturity)]
+## Calculate CBOE MFIV for the whole dataset
+option_dataset[, sigma_sq := future_mapply(CBOE_VIX_vars, option_quotes, R, maturity),
+               future.seed = 1337]
 option_dataset
 ```
 
@@ -225,7 +228,8 @@ multicols <- function(matrix){
 option_dataset[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq") := 
                  multicols(future_mapply(CBOE_VIX_vars,
                                          option_quotes, R, maturity,
-                                         MoreArgs = list(ret_vars = T))
+                                         MoreArgs = list(ret_vars = T),
+                                         future.seed = 1337)
                  )]
 option_dataset
 ```
@@ -271,7 +275,7 @@ option_dataset
 ## 5. Improve Option-Data Quality using Smooting Methods
 ```{r}
 ## Use the Jiang & Tian (2007) smoothing method to fill in and extrapolate the option quotes.
-option_dataset[, option_quotes_smooth := future_mapply(JandT_2007_smoothing_method,
+option_dataset <- option_dataset[, option_quotes_smooth := future_mapply(JandT_2007_smoothing_method,
                                                        option_quotes, K_0, price, R, maturity, F_0,
                                                        SIMPLIFY = F)]
 
@@ -292,3 +296,28 @@ mean(smooth_quotes$K - data.table::shift(smooth_quotes$K), na.rm = T)
 3 / (option_dataset$SD[[1]] * option_dataset$price[[1]] * sqrt(option_dataset$maturity[[1]]))
 ```
 
+Now calculate the MFIV using the Jiang & Tian (2007) method:
+```{r}
+option_dataset[, sigma_sq_smooth := future_mapply(JandT_2007_sigma_sq,
+                                                  option_quotes_smooth, K_0, maturity, R)]
+```
+Calculate the respective VIX indices
+```{r}
+## Weekly VIX
+weekly_smooth <- option_dataset[!is.na(term_wk)][, .(VIX_wk_smooth = CBOE_VIX_index(maturity = maturity,
+                                                                                    sigma_sq = sigma_sq_smooth)),
+                                                 by = .(ticker, t)]
+
+## Monthly VIX
+monthly_smooth <- option_dataset[!is.na(term_mn)][, .(VIX_mn_smooth = CBOE_VIX_index(maturity = maturity,
+                                                                                     sigma_sq = sigma_sq_smooth)),
+                                                  by = .(ticker, t)]
+
+VIX_data_smooth <- weekly_smooth[monthly_smooth, on = .(ticker, t)]
+
+VIX_data_2 <- VIX_data[VIX_data_smooth, on = .(ticker, t)]
+
+plot_VIX(data = VIX_data_2,
+         VIX_vars = c("VIX_wk", "VIX_mn",
+                      "VIX_wk_smooth", "VIX_mn_smooth"))
+```

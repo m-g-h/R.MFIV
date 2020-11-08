@@ -6,7 +6,17 @@
 Implied Volatility Curve Fitting
 \loadmathjax}
 \usage{
-JandT_2007_smoothing_method(option_quotes, K_0, price, R, maturity, F_0)
+JandT_2007_smoothing_method(
+  option_quotes,
+  K_0,
+  price,
+  R,
+  maturity,
+  F_0,
+  tail_length = 15,
+  flat_tails = T,
+  increment = "min"
+)
 }
 \arguments{
 \item{option_quotes}{A \code{data.table} or "nest" of option quotes with three columns:
@@ -28,36 +38,54 @@ maturity \mjseqn{T} in decimal}
 
 \item{F_0}{\code{numeric scalar}, giving the  theoretical at-the-money forward \mjseqn{F_0}
 (see \code{\link{CBOE_F_0}})}
+
+\item{tail_length}{\code{numeric scalar} giving the strike-price range of the
+returned option quotes in \mjseqn{SD} units (see details). If the tail length
+doesn't exceed the the range of the given option quotes, no extrapolation takes place.}
+
+\item{flat_tails}{\code{logical scalar} determining whether the extrapolation in the
+tails is sloped or flat (see details)}
+
+\item{increment}{\code{character or numeric scalar} giving the strike-price increment
+of the returned option quotes in \mjseqn{SD} units (see details). Options are:
+\itemize{
+\item {\strong{x} (\code{numeric})}{ - any number giving the strike-price increment
+in price units}
+\item {\strong{"JT"} (\code{character})}{ - the increment from Jiang & Tian (2007)
+i.e. \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}}
+\item {\strong{"real"} (\code{character})}{ - the smallest increment found in the
+"real" data}
+\item {\strong{"min"} (\code{character})}{ - the smaller one of "JT" and "min"}
+}}
 }
 \value{
 Returns a \code{data.table} of intra- and extrapolated option quotes with the
 following columns:
 \itemize{
-\item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
-\item {\strong{Q} (\code{numeric})}{ - OTM option}
+\item {\strong{K} (\code{numeric})}{ - evenly spaced strike price in ascending order}
+\item {\strong{Q} (\code{numeric})}{ - OTM option price}
 }
 }
 \description{
-Extend and fill in the option quotes using Jiang & Tian (2005, 2007)
-Implied Volatility Curve Fitting
-\loadmathjax
+Intrapolates and extrapolates the option_quotes over the strike price range using
+the Jiang & Tian (2007) smoothing method. The given quotes are transformed into
+Black & Scholes implied volatilities, on which intra/extrapolation takes place.
 }
 \details{
-The CBOE VIX calculation method relies on a wide option quotes over the range of
-strike prices. However, the actual data might not yield enough option quotes. If
-the quotes are spaced apart too far and have a limited range over the strike prices,
-this introduces errors (see Jiang & Tian (2005, 2007)).
+Inside the given range of strike prices, (natural) cubic spline intrapolation takes
+place.
 
-Jiang & Tian (2005, 2007) also propose a smoothing method: option quotes are
-transformed in to Black \& Scholes implied volatilities, intra- and extrapolated,
-an then transformed back into option prices. This methodology is provided by this
-function.
+The tails are extrapolated linearly. For \code{flat} extrapolation, the "outer-most"
+implied volatility is used, for \code{sloped} extrapolation the slope of the two
+"outer-most" implied volatilities is used.
 
-After application of this method, the returned option_quotes are spaced apart by
-\mjseqn{0.35} "SD Units", which translates into option price increments of
-\mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}, where \mjseqn{SD}
-refers to a B&S implied volatility of the at-the-money option. The range of the
-returned data spans \mjseqn{\pm 15} SD units.
+After intra/extrapolation, the implied volatilities are transformed back into option
+prices via Black&Scholes, i.e. out-of-the-money puts and calls.
+
+Jiang & Tian (2007) define the range and increment of the strike prices in \mjseqn{SD}
+units. This \mjseqn{SD} is the Black & Scholes implied volatility of the at-the-money
+option. As an example, the increment recommended by Jiang & Tian (2007) is mjseqn{0.35}
+units: \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}
 }
 \examples{
 
@@ -68,12 +96,11 @@ nest <- option_dataset$option_quotes[[1]]
 
 ## EXTRAPOLATE DATA
 JandT_2007_smoothing_method(option_quotes = nest,
-                            maturity = 0.008953152,
+                            maturity = 0.06644802,
                             K_0 = 147,
-                            price = 147.39,
-                            R = 0.008325593,
-                            F_0 = 147.405)
-
+                            R = 0.008769736,
+                            F_0 = 147.5697,
+                            price = 147.39)
 }
 \references{
 \href{https://doi.org/10.1093/RFS\%2FHHI027}{Jiang & Tian (2005) -

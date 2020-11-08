@@ -361,34 +361,7 @@ option_dataset[, `:=`(term_wk = future_sapply(maturity, CBOE_interpolation_terms
                                               maturity, as_date(t), as_date(exp),
                                               MoreArgs = list(method = "monthly"))
 )]
-#> Warning: UNRELIABLE VALUE: Future ('future_mapply-1') unexpectedly generated
-#> random numbers without specifying argument '[future.]seed'. There is a risk that
-#> those random numbers are not statistically sound and the overall results might
-#> be invalid. To fix this, specify argument '[future.]seed', e.g. 'seed=TRUE'.
-#> This ensures that proper, parallel-safe random numbers are produced via the
-#> L'Ecuyer-CMRG method. To disable this check, use [future].seed=NULL, or set
-#> option 'future.rng.onMisuse' to "ignore".
-#> Warning: UNRELIABLE VALUE: Future ('future_mapply-2') unexpectedly generated
-#> random numbers without specifying argument '[future.]seed'. There is a risk that
-#> those random numbers are not statistically sound and the overall results might
-#> be invalid. To fix this, specify argument '[future.]seed', e.g. 'seed=TRUE'.
-#> This ensures that proper, parallel-safe random numbers are produced via the
-#> L'Ecuyer-CMRG method. To disable this check, use [future].seed=NULL, or set
-#> option 'future.rng.onMisuse' to "ignore".
-#> Warning: UNRELIABLE VALUE: Future ('future_mapply-3') unexpectedly generated
-#> random numbers without specifying argument '[future.]seed'. There is a risk that
-#> those random numbers are not statistically sound and the overall results might
-#> be invalid. To fix this, specify argument '[future.]seed', e.g. 'seed=TRUE'.
-#> This ensures that proper, parallel-safe random numbers are produced via the
-#> L'Ecuyer-CMRG method. To disable this check, use [future].seed=NULL, or set
-#> option 'future.rng.onMisuse' to "ignore".
-#> Warning: UNRELIABLE VALUE: Future ('future_mapply-4') unexpectedly generated
-#> random numbers without specifying argument '[future.]seed'. There is a risk that
-#> those random numbers are not statistically sound and the overall results might
-#> be invalid. To fix this, specify argument '[future.]seed', e.g. 'seed=TRUE'.
-#> This ensures that proper, parallel-safe random numbers are produced via the
-#> L'Ecuyer-CMRG method. To disable this check, use [future].seed=NULL, or set
-#> option 'future.rng.onMisuse' to "ignore".
+
 ## Select only options needed for the weekly and monthly VIX
 option_dataset <- option_dataset[!is.na(term_wk)
                                  | !is.na(term_mn)]
@@ -427,7 +400,7 @@ Calculate the Implied Variances for a complete dataset
 option_dataset[, `:=`(R = interpolate_rfr(date = as_date(t),
                                           exp = exp))]
 
-## Calculate VIX for the whole dataset
+## Calculate CBOE MFIV for the whole dataset
 option_dataset[, sigma_sq := future_mapply(CBOE_VIX_vars, option_quotes, R, maturity)]
 option_dataset
 #>       ticker                   t        exp   price       option_quotes
@@ -607,59 +580,11 @@ option_dataset
 
 ``` r
 ## Use the Jiang & Tian (2007) smoothing method to fill in and extrapolate the option quotes.
-option_dataset[, option_quotes_smooth := future_mapply(JandT_2007_smoothing_method,
+option_dataset <- option_dataset[, option_quotes_smooth := future_mapply(JandT_2007_smoothing_method,
                                                        option_quotes, K_0, price, R, maturity, F_0,
                                                        SIMPLIFY = F)]
 
 option_dataset
-#>       ticker                   t        exp   price       option_quotes
-#>    1:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
-#>    2:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
-#>    3:   AAAA 2017-06-13 09:31:00 2017-07-21 147.390  <data.table[42x3]>
-#>    4:   AAAA 2017-06-13 09:31:00 2017-08-18 147.390  <data.table[61x3]>
-#>    5:   AAAA 2017-06-13 09:32:00 2017-07-07 147.130  <data.table[51x3]>
-#>   ---                                                                  
-#> 3116:   BBBB 2017-06-13 15:59:00 2017-08-18 979.755  <data.table[92x3]>
-#> 3117:   BBBB 2017-06-13 16:00:00 2017-07-07 980.805  <data.table[99x3]>
-#> 3118:   BBBB 2017-06-13 16:00:00 2017-07-14 980.805  <data.table[65x3]>
-#> 3119:   BBBB 2017-06-13 16:00:00 2017-07-21 980.805 <data.table[121x3]>
-#> 3120:   BBBB 2017-06-13 16:00:00 2017-08-18 980.805  <data.table[92x3]>
-#>         maturity term_wk term_mn           R   sigma_sq      F_0 K_0 n_put_raw
-#>    1: 0.06644802       1      NA 0.008769736 0.05416683 147.5697 147        24
-#>    2: 0.08561297       2      NA 0.008911253 0.05222205 147.5497 147        15
-#>    3: 0.10477793      NA       1 0.009049549 0.05213150 147.5927 145         8
-#>    4: 0.18143775      NA       2 0.009571069 0.06150820 147.4042 145         9
-#>    5: 0.06644612       1      NA 0.008769736 0.05362052 147.2551 147        24
-#>   ---                                                                         
-#> 3116: 0.18070005      NA       2 0.009571069 0.07185948 982.6045 980        52
-#> 3117: 0.06570842       1      NA 0.008769736 0.04598859 981.3243 980        43
-#> 3118: 0.08487337       2      NA 0.008911253 0.04675662 982.0747 980        25
-#> 3119: 0.10403833      NA       1 0.009049549 0.04784626 982.4523 980        50
-#> 3120: 0.18069815      NA       2 0.009571069 0.07206823 983.2470 980        52
-#>       n_call_raw n_put n_call        SD  max_K min_K mean_delta_K
-#>    1:         10    24     10 0.2218317  167.5   123     1.308824
-#>    2:         14    15     14 0.2189827  177.5   115     2.155172
-#>    3:          9     8      9 0.2196033  190.0   100     5.294118
-#>    4:         11     9     11 0.2395117  200.0   100     5.000000
-#>    5:         10    24     10 0.2208317  167.5   123     1.308824
-#>   ---                                                            
-#> 3116:         38    52     38 0.2695806 1400.0   720     7.555556
-#> 3117:         52    43     52 0.2037625 1140.0   790     3.684211
-#> 3118:         34    25     34 0.2050042 1130.0   800     5.593220
-#> 3119:         22    50     22 0.2152011 1200.0   650     7.638889
-#> 3120:         38    52     38 0.2670286 1400.0   720     7.555556
-#>       option_quotes_smooth
-#>    1:   <data.table[98x2]>
-#>    2:  <data.table[112x2]>
-#>    3:  <data.table[133x2]>
-#>    4:  <data.table[149x2]>
-#>    5:  <data.table[142x2]>
-#>   ---                     
-#> 3116:  <data.table[134x2]>
-#> 3117:  <data.table[100x2]>
-#> 3118:  <data.table[101x2]>
-#> 3119:  <data.table[102x2]>
-#> 3120:  <data.table[133x2]>
 ```
 
 Let’s look at one nest of smoothed `option_quotes`
@@ -669,16 +594,47 @@ Let’s look at one nest of smoothed `option_quotes`
 smooth_quotes <- option_dataset$option_quotes_smooth[[1]]
 
 min(smooth_quotes$K)
-#> [1] 63
+#> [1] 65
 max(smooth_quotes$K)
-#> [1] 356.5
+#> [1] 335
 length(smooth_quotes$K)
-#> [1] 98
+#> [1] 271
 ## Average spacing in price units
 mean(smooth_quotes$K - data.table::shift(smooth_quotes$K), na.rm = T)
-#> [1] 3.025773
+#> [1] 1
 
 ## Spacing in SD units
 3 / (option_dataset$SD[[1]] * option_dataset$price[[1]] * sqrt(option_dataset$maturity[[1]]))
 #> [1] 0.3559497
 ```
+
+Now calculate the MFIV using the Jiang & Tian (2007) method:
+
+``` r
+option_dataset[, sigma_sq_smooth := future_mapply(JandT_2007_sigma_sq,
+                                                  option_quotes_smooth, K_0, maturity, R)]
+```
+
+Calculate the respective VIX indices
+
+``` r
+## Weekly VIX
+weekly_smooth <- option_dataset[!is.na(term_wk)][, .(VIX_wk_smooth = CBOE_VIX_index(maturity = maturity,
+                                                                                    sigma_sq = sigma_sq_smooth)),
+                                                 by = .(ticker, t)]
+
+## Monthly VIX
+monthly_smooth <- option_dataset[!is.na(term_mn)][, .(VIX_mn_smooth = CBOE_VIX_index(maturity = maturity,
+                                                                                     sigma_sq = sigma_sq_smooth)),
+                                                  by = .(ticker, t)]
+
+VIX_data_smooth <- weekly_smooth[monthly_smooth, on = .(ticker, t)]
+
+VIX_data_2 <- VIX_data[VIX_data_smooth, on = .(ticker, t)]
+
+plot_VIX(data = VIX_data_2,
+         VIX_vars = c("VIX_wk", "VIX_mn",
+                      "VIX_wk_smooth", "VIX_mn_smooth"))
+```
+
+<img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />

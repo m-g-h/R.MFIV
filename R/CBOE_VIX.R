@@ -172,10 +172,10 @@ CBOE_delta_K <- function(K){
 #' nest <- CBOE_option_selection(option_dataset$option_quotes[[1]],
 #'                               147)
 #' CBOE_sigma_sq(sel_option_quotes = nest,
-#'               K_0 = 147,
-#'               F_0 = 147.5,
-#'               maturity = 0.07,
-#'               R = 0.005)
+#'              maturity = 0.06644802,
+#'              K_0 = 147,
+#'              R = 0.008769736,
+#'              F_0 = 147.5697)
 
 CBOE_sigma_sq <- function(sel_option_quotes, K_0, F_0, maturity, R){
   sel_option_quotes[, .(K = K,

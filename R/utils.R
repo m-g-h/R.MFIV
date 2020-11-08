@@ -29,5 +29,6 @@ utils::globalVariables(c(".",
                          "IV",
                          "TypeFlag",
                          "x",
-                         "y")
+                         "y",
+                         "QK")
 )
