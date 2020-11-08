@@ -42,6 +42,7 @@
 #'   "real" data}
 #'   \item {\strong{"min"} (\code{character})}{ - the smaller one of "JT" and "min"}
 #' }
+#' The increment is at least 0.5, unless a numeric value is provided.
 #' @return Returns a \code{data.table} of intra- and extrapolated option quotes with the
 #' following columns:
 #' \itemize{
@@ -113,6 +114,11 @@ JandT_2007_smoothing_method <- function(option_quotes,
     inc_real <- min(option_quotes$K - shift(option_quotes$K), na.rm = T)
 
     inc <- min(inc, inc_real)
+  }
+
+  ## AT LEAST 0.5 UNLESS A VALUE IS GIVEN
+  if(!is.numeric(increment)){
+    inc <- max(inc, 0.5)
   }
 
   # CREATE CENTRAL PART OF THE OPTION_QUOTES

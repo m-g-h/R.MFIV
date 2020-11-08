@@ -63,7 +63,8 @@ In order to calculate the VIX and its individual variables, this package provide
 
 **5. Improve Option-Data Quality using Smooting Methods**
 
-
+- Intra- and Extrapolate option quotes `JandT_2007_smoothing_method()`
+- Calculate the Jiang & Tian MFIV `JandT_2007_sigma_sq()`
 
 
 ## 1. Short Walkthrough 
@@ -121,7 +122,7 @@ option_quotes <- CBOE_option_selection(option_quotes = option_quotes,
 option_quotes
 
 ```
-Optionally calculate the Implied Variance &sigma;^2^
+Calculate the Implied Variance &sigma;^2^
 ```{r}
 sigma_sq <- CBOE_sigma_sq(sel_option_quotes = option_quotes,
                           K_0 = K_0,
@@ -162,7 +163,7 @@ Calculate and interpolate the VIX index from both maturities
 CBOE_VIX_index(maturity = c(maturity, maturity2),
                sigma_sq = c(sigma_sq,VIX_vars$sigma_sq))
 ```
-Calculate Option Descriptives, i.e. the strike price range and spacing in standard-deviation (SD) units of the used option quotes:
+Optionally calculate Option Descriptives, i.e. the strike price range and spacing in standard-deviation (SD) units of the used option quotes:
 ```{r}
 price <- option_dataset$price[4]
 option_descriptives(option_quotes = option_quotes,

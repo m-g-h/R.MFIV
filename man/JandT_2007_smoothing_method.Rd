@@ -56,7 +56,8 @@ i.e. \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}}
 \item {\strong{"real"} (\code{character})}{ - the smallest increment found in the
 "real" data}
 \item {\strong{"min"} (\code{character})}{ - the smaller one of "JT" and "min"}
-}}
+}
+The increment is at least 0.5, unless a numeric value is provided.}
 }
 \value{
 Returns a \code{data.table} of intra- and extrapolated option quotes with the

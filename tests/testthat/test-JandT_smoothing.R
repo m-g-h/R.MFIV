@@ -1,4 +1,4 @@
-test_that("mJandT_2007_smoothing_method() works", {
+test_that("JandT_2007_smoothing_method() works", {
   ## LOAD EXAMPLE OPTION_QUOTES
   nest <- R.MFIV::option_dataset$option_quotes[[1]]
 
