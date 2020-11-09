@@ -236,7 +236,17 @@ CBOE_VIX_vars <- function(option_quotes, R, maturity,
             "returned. There were less than two quotes in ",
             crayon::silver("`option_quotes`"),
             ".")
-    return(NA)
+    if(ret_vars){
+      return(list("F_0" = NA,
+                  "K_0" = NA,
+                  "n_put_raw" = NA,
+                  "n_call_raw" = NA,
+                  "n_put" = NA,
+                  "n_call" = NA,
+                  "sigma_sq" = NA))
+    } else {
+      return(NA)
+    }
   }
   ## CALCULATE FIRST TWO VARIABLES
   F_0 <- CBOE_F_0(option_quotes = option_quotes,
@@ -254,7 +264,17 @@ CBOE_VIX_vars <- function(option_quotes, R, maturity,
             "returned. There were no put / call quotes in ",
             crayon::silver("`option_quotes`"),
             ".")
-    return(NA)
+    if(ret_vars){
+      return(list("F_0" = F_0,
+                  "K_0" = K_0,
+                  "n_put_raw" = n_put_raw,
+                  "n_call_raw" = n_call_raw,
+                  "n_put" = NA,
+                  "n_call" = NA,
+                  "sigma_sq" = NA))
+    } else {
+      return(NA)
+    }
   }
 
   ## OPTION SELECTION
@@ -269,7 +289,17 @@ CBOE_VIX_vars <- function(option_quotes, R, maturity,
             "returned. There were no put / call quotes left in ",
             crayon::silver("`option_quotes`"),
             " after selecting by the CBOE rule.")
-    return(NA)
+    if(ret_vars){
+      return(list("F_0" = F_0,
+                  "K_0" = K_0,
+                  "n_put_raw" = n_put_raw,
+                  "n_call_raw" = n_call_raw,
+                  "n_put" = n_put,
+                  "n_call" = n_call,
+                  "sigma_sq" = NA))
+    } else {
+      return(NA)
+    }
   }
   ## sigma^2
   sigma_sq <- CBOE_sigma_sq(sel_option_quotes = option_quotes_sel,
