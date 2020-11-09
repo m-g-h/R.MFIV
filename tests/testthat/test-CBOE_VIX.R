@@ -166,7 +166,20 @@ test_that("CBOE_VIX_vars() warnings work", {
                                                         maturity = 0.07,
                                                         ret_vars = F)),
                          NA)
-  ## IS IT THE FIRST WARNING MESSAGE
+  ## IS A LIST OF NA VALUES RETURNED FOR ret_vars = T?
+  testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_1,
+                                                        R = 0.005,
+                                                        maturity = 0.07,
+                                                        ret_vars = T)),
+                         list("F_0" = NA,
+                              "K_0" = NA,
+                              "n_put_raw" = NA,
+                              "n_call_raw" = NA,
+                              "n_put" = NA,
+                              "n_call" = NA,
+                              "sigma_sq" = NA))
+
+  ## IS IT THE FIRST WARNING MESSAGE?
   testthat::expect_warning(CBOE_VIX_vars(option_quotes = nest_1,
                                          R = 0.005,
                                          maturity = 0.07,
@@ -182,16 +195,29 @@ test_that("CBOE_VIX_vars() warnings work", {
                                                         maturity = 0.07,
                                                         ret_vars = F)),
                          NA)
-  ## IS IT THE SECOND WARNING MESSAGE
+  ## IS A LIST OF NA VALUES RETURNED FOR ret_vars = T?
+  testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_2,
+                                                        R = 0.005,
+                                                        maturity = 0.07,
+                                                        ret_vars = T)),
+                         list("F_0" = NA,
+                              "K_0" = NA,
+                              "n_put_raw" = NA,
+                              "n_call_raw" = NA,
+                              "n_put" = NA,
+                              "n_call" = NA,
+                              "sigma_sq" = NA))
+
+  ## IS IT THE SECOND WARNING MESSAGE?
   testthat::expect_warning(CBOE_VIX_vars(option_quotes = nest_2,
                                          R = 0.005,
                                          maturity = 0.07,
                                          ret_vars = F),
-                           regexp = "There were no put / call quotes in")
+                           regexp = "Could not calculate")
 
-  ## THIRD WARNING FOR CALLS
-  nest_3 <- option_dataset$option_quotes[[1]]
-  nest_3$c[60:61] <- NA
+
+  ## THIRD WARNING
+  nest_3 <- option_dataset$option_quotes[[1]][32:38,]
 
   ## IS A NA VALUE RETURNED?
   testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_3,
@@ -199,16 +225,31 @@ test_that("CBOE_VIX_vars() warnings work", {
                                                         maturity = 0.07,
                                                         ret_vars = F)),
                          NA)
-  ## IS IT THE THIRD WARNING MESSAGE
+  ## IS A LIST OF NA VALUES RETURNED FOR ret_vars = T?
+  testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_3,
+                                                        R = 0.005,
+                                                        maturity = 0.07,
+                                                        ret_vars = T)),
+                         list("F_0" = 147.38783437093494,
+                              "K_0" = 126,
+                              "n_put_raw" = 4,
+                              "n_call_raw" = 0,
+                              "n_put" = NA,
+                              "n_call" = NA,
+                              "sigma_sq" = NA))
+
+  ## IS IT THE THIRD WARNING MESSAGE?
   testthat::expect_warning(CBOE_VIX_vars(option_quotes = nest_3,
                                          R = 0.005,
                                          maturity = 0.07,
                                          ret_vars = F),
-                           regexp = "after selecting by the CBOE rule")
+                           regexp = "There were no put / call quotes in")
 
-  ## THIRD WARNING FOR PUTS
+
+
+  ## FOURTH WARNING FOR CALLS
   nest_4 <- option_dataset$option_quotes[[1]]
-  nest_4$p[58:57] <- NA
+  nest_4$c[60:61] <- NA
 
   ## IS A NA VALUE RETURNED?
   testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_4,
@@ -216,8 +257,51 @@ test_that("CBOE_VIX_vars() warnings work", {
                                                         maturity = 0.07,
                                                         ret_vars = F)),
                          NA)
-  ## IS IT THE THIRD WARNING MESSAGE
+  ## IS A LIST OF NA VALUES RETURNED FOR ret_vars = T?
+  testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_4,
+                                                        R = 0.005,
+                                                        maturity = 0.07,
+                                                        ret_vars = T)),
+                         list("F_0" = 147.40514177480915,
+                              "K_0" = 147,
+                              "n_put_raw" = 24,
+                              "n_call_raw" = 6,
+                              "n_put" = 24,
+                              "n_call" = 0,
+                              "sigma_sq" = NA))
+
+  ## IS IT THE FOURTH WARNING MESSAGE ?
   testthat::expect_warning(CBOE_VIX_vars(option_quotes = nest_4,
+                                         R = 0.005,
+                                         maturity = 0.07,
+                                         ret_vars = F),
+                           regexp = "after selecting by the CBOE rule")
+
+  ## FOURTH WARNING FOR PUTS
+  nest_5 <- option_dataset$option_quotes[[1]]
+  nest_5$p[58:57] <- NA
+
+  ## IS A NA VALUE RETURNED?
+  testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_5,
+                                                        R = 0.005,
+                                                        maturity = 0.07,
+                                                        ret_vars = F)),
+                         NA)
+  ## IS A LIST OF NA VALUES RETURNED FOR ret_vars = T?
+  testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_5,
+                                                        R = 0.005,
+                                                        maturity = 0.07,
+                                                        ret_vars = T)),
+                         list("F_0" = 147.40514177480915,
+                              "K_0" = 147,
+                              "n_put_raw" = 22,
+                              "n_call_raw" = 8,
+                              "n_put" = 0,
+                              "n_call" = 8,
+                              "sigma_sq" = NA))
+
+  ## IS IT THE FOURTH WARNING MESSAGE ?
+  testthat::expect_warning(CBOE_VIX_vars(option_quotes = nest_5,
                                          R = 0.005,
                                          maturity = 0.07,
                                          ret_vars = F),
@@ -275,10 +359,10 @@ test_that("CBOE_VIX_index() works", {
 
   ## NORMAL CALCULATION (INTRAPOLATION)
   testthat::expect_equal(CBOE_VIX_index(maturity = c(0.074, 0.09),
-                       sigma_sq = c(0.3, 0.5)),
-                       64.196962544967803)
+                                        sigma_sq = c(0.3, 0.5)),
+                         64.196962544967803)
   ## NORMAL CALCULATION (EXTRAPOLATION)
   testthat::expect_equal(CBOE_VIX_index(maturity = c(0.09, 0.12),
-                       sigma_sq = c(0.3, 0.5)),
-                       47.328638264796922)
+                                        sigma_sq = c(0.3, 0.5)),
+                         47.328638264796922)
 })

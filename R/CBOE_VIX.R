@@ -255,6 +255,25 @@ CBOE_VIX_vars <- function(option_quotes, R, maturity,
 
   K_0 <- CBOE_K_0(option_quotes = option_quotes,
                   F_0 = F_0)
+  if(length(K_0) == 0 | length(F_0) == 0){
+    warning(crayon::silver("NA "),
+            "returned. Could not calculate",
+            crayon::silver("F_0"),
+            " and ",
+            crayon::silver("K_0"),
+            ".")
+    if(ret_vars){
+      return(list("F_0" = NA,
+                  "K_0" = NA,
+                  "n_put_raw" = NA,
+                  "n_call_raw" = NA,
+                  "n_put" = NA,
+                  "n_call" = NA,
+                  "sigma_sq" = NA))
+    } else {
+      return(NA)
+    }
+  }
   ## HELPERS
   n_put_raw <- option_quotes[K<K_0 &!is.na(p), .N]
   n_call_raw <- option_quotes[K>K_0 &!is.na(c), .N]
