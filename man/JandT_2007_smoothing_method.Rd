@@ -86,7 +86,8 @@ prices via Black&Scholes, i.e. out-of-the-money puts and calls.
 Jiang & Tian (2007) define the range and increment of the strike prices in \mjseqn{SD}
 units. This \mjseqn{SD} is the Black & Scholes implied volatility of the at-the-money
 option. As an example, the increment recommended by Jiang & Tian (2007) is mjseqn{0.35}
-units: \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}
+units: \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}. The range is calculated
+accordingly as \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot}\code{ tail_length}.
 }
 \examples{
 
