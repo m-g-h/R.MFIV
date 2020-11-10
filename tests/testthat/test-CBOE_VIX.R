@@ -112,9 +112,22 @@ test_that("CBOE_F_0() works", {
 })
 
 test_that("CBOE_K_0() works", {
+  ## JUST NORMAL CALCULATION
   testthat::expect_equal(CBOE_K_0(option_quotes = option_dataset$option_quotes[[1]],
                                   F_0 = 147.5),
                          147)
+  ## p is NA
+  nest_1 <- option_dataset$option_quotes[[1]]
+  nest_1[K == 147]$p <- NA
+  testthat::expect_equal(CBOE_K_0(option_quotes = nest_1,
+                                  F_0 = 147.5),
+                         NA)
+  ## c is NA
+  nest_2 <- option_dataset$option_quotes[[1]]
+  nest_2[K == 147]$c <- NA
+  testthat::expect_equal(CBOE_K_0(option_quotes = nest_2,
+                                  F_0 = 147.5),
+                         NA)
 })
 
 test_that("CBOE_sigma_sq() works", {
@@ -217,7 +230,7 @@ test_that("CBOE_VIX_vars() warnings work", {
 
 
   ## THIRD WARNING
-  nest_3 <- option_dataset$option_quotes[[1]][32:38,]
+  nest_3 <- option_dataset$option_quotes[[1]][32:37,]
 
   ## IS A NA VALUE RETURNED?
   testthat::expect_equal(suppressWarnings(CBOE_VIX_vars(option_quotes = nest_3,
@@ -231,8 +244,8 @@ test_that("CBOE_VIX_vars() warnings work", {
                                                         maturity = 0.07,
                                                         ret_vars = T)),
                          list("F_0" = 147.38783437093494,
-                              "K_0" = 126,
-                              "n_put_raw" = 4,
+                              "K_0" = 125,
+                              "n_put_raw" = 3,
                               "n_call_raw" = 0,
                               "n_put" = NA,
                               "n_call" = NA,

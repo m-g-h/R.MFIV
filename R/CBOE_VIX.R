@@ -68,7 +68,12 @@ CBOE_F_0 <- function(option_quotes, R, maturity){
 #'          F_0 = F_0)
 
 CBOE_K_0 <- function(option_quotes, F_0){
-  option_quotes[K <= F_0, K[.N]]
+  ret <- option_quotes[K <= F_0][.N][!is.na(c) & !is.na(p), K]
+  if(length(ret) == 0){
+    return(NA)
+  } else {
+    return(ret)
+  }
 }
 
 #' CBOE Option selection scheme
