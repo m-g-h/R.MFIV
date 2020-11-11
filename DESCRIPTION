@@ -14,11 +14,11 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
     mathjaxr,
+    lubridate,
     data.table,
     crayon,
     rvest,
     xml2,
-    lubridate,
     fOptions
 Suggests: 
     testthat (>= 2.1.0),

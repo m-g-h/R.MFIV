@@ -368,6 +368,9 @@ CBOE_VIX_vars <- function(option_quotes, R, maturity,
 #' If the maturity doesn't fall inside either category, \code{NA} is returned.
 #' @export
 #'
+#' @importFrom lubridate weeks
+#' @importFrom data.table fcase
+#'
 #' @examples
 #'
 #' library(R.MFIV)
@@ -388,7 +391,7 @@ CBOE_interpolation_terms <- function(maturity, date_t, date_exp, method){
           TRUE , NA_real_)
     ## MONTHLY METHOD
   } else if(method == "monthly"){
-    valid_days <- third_fridays(date_t , date_exp + months(3))
+    valid_days <- third_fridays(date_t , date_exp + weeks(12))
     valid_days <- valid_days[valid_days-date_t > 7]
     fcase(date_exp == valid_days[1], 1,
           date_exp == valid_days[2], 2,

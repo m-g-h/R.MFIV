@@ -69,6 +69,9 @@ option_descriptives <- function(option_quotes, K_0, R, price,  maturity){
 #' @return Returns a \code{date vector} with all third fridays of the respective period.
 #' @export
 #'
+#' @importFrom lubridate floor_date ceiling_date days
+#' @importFrom data.table data.table wday year
+#'
 #' @examples
 #'
 #' start <- lubridate::ymd("2020-01-01")
@@ -78,13 +81,13 @@ option_descriptives <- function(option_quotes, K_0, R, price,  maturity){
 
 third_fridays <- function(start, end){
   ## ROUND DATES TO START AND END OF MONTHS RESPECTIVELY
-  alpha <- lubridate::floor_date(start, "months")
-  omega <- lubridate::ceiling_date(end, "months")
+  alpha <- floor_date(start, "months")
+  omega <- ceiling_date(end, "months")
 
   ## GENERATE SEQUENCE OF ALL SINGLE DAYS AND FILTER OUT THE THIRD FRIDAYS
-  data.table::data.table(all_days = alpha + lubridate::days(1:as.numeric(omega - alpha))
-  )[lubridate::wday(all_days) == 6,
-  ][,my := paste(lubridate::year(all_days), lubridate::month(all_days))
+  data.table(all_days = alpha + days(1:as.numeric(omega - alpha))
+  )[wday(all_days) == 6,
+  ][,my := paste(year(all_days), month(all_days))
   ][, ind := 1:.N, by = my
   ][ind == 3, all_days]
 }

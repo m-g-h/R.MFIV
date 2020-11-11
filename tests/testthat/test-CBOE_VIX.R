@@ -362,6 +362,12 @@ test_that("CBOE_interpolation_terms() works", {
                                    NA, NA, 1, 2, NA,
                                    NA, NA, NA, 1, 2))
 
+  ## Test special Case that threw an error in practice
+  testthat::expect_equal(CBOE_interpolation_terms(date_t = lubridate::ymd("2017-02-09"),
+                           date_exp = lubridate::ymd("2017-03-31"),
+                           method = "monthly"),
+                         NA_integer_)
+
 })
 
 test_that("CBOE_VIX_index() works", {
