@@ -77,18 +77,10 @@ result_browser <- function(data, index_var = "t", VIX_vars = c("VIX_wk", "VIX_mn
     ## CHECKBOX VARIABLE SELECTOR
     output$var_selector <- shiny::renderUI({
 
-      ## Create readable variable names in the standard case
-      choice_names <- data.table::fcase(
-        VIX_vars == "VIX_wk", "Weekly 2014 VIX",
-        VIX_vars == "VIX_mn", "Monthly 2003 VIX",
-        TRUE, VIX_vars
-      )
-
-      shiny::checkboxGroupInput(inputId = "var_selector",
+          shiny::checkboxGroupInput(inputId = "var_selector",
                                 label = "Variables",
                                 selected = VIX_vars[1],
-                                choiceValues = VIX_vars,
-                                choiceNames = choice_names)
+                                choices = VIX_vars)
     })
 
     output$plot <- plotly::renderPlotly({
