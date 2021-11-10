@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# R.MFIV
+# R.MFIV <img src="man/figures/hex_small.svg" align="right" />
 
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.com/m-g-h/R.MFIV.svg?branch=master)](https://travis-ci.com/m-g-h/R.MFIV)
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 R.MFIV is currently in development. It can be installed via:
-```{r}
+```{r, eval = FALSE}
 remotes::install_github("m-g-h/R.MFIV")
 ```
 
@@ -79,7 +79,7 @@ data(option_dataset)
 option_dataset
 ```
 
-We select an exemplary entry as an example. This observation will be our "near-term" contract. Also note that `option_quotes` is a "nested" data.table itself
+We select an exemplary entry for the calculation. This observation will be our "near-term" contract. Also note that `option_quotes` is a "nested" data.table itself
 ```{r}
 
 t <- option_dataset$t[4]
@@ -214,8 +214,8 @@ option_dataset[, `:=`(R = interpolate_rfr(date = as_date(t),
                                           exp = exp))]
 
 ## Calculate CBOE MFIV for the whole dataset
-option_dataset[, sigma_sq := future_mapply(CBOE_VIX_vars, option_quotes, R, maturity),
-               future.seed = 1337]
+option_dataset[, sigma_sq := future_mapply(CBOE_VIX_vars, option_quotes, R, maturity, future.seed = 1337)
+               ]
 option_dataset
 ```
 
@@ -280,7 +280,7 @@ option_dataset
 ## 5. Improve Option-Data Quality using Smooting Methods
 ```{r}
 ## Use the Jiang & Tian (2007) smoothing method to fill in and extrapolate the option quotes.
-option_dataset <- option_dataset[, option_quotes_smooth := future_mapply(JandT_2007_smoothing_method,
+option_dataset[, option_quotes_smooth := future_mapply(JandT_2007_smoothing_method,
                                                        option_quotes, K_0, price, R, maturity, F_0,
                                                        SIMPLIFY = F)]
 

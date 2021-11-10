@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# R.MFIV
+# R.MFIV <img src="man/figures/hex_small.svg" align="right" />
 
 <!-- badges: start -->
 
@@ -34,40 +34,43 @@ sections
 
 **1. Short Walkthrough**
 
-  - Calculate the *Risk-Free-Rate R* `interpolate_rfr()`
-  - Calculate the *At-The-Money Forward Price F<sub>0</sub>*
+-   Calculate the *Risk-Free-Rate R* `interpolate_rfr()`
+-   Calculate the *At-The-Money Forward Price F<sub>0</sub>*
     `CBOE_F_O()`
-  - Calculate the *At-The-Money Strike Price K<sub>0</sub>* `CBOE_K_0()`
-  - *Select* the Option Quotes Q(K<sub>i</sub>) according to the CBOE
+-   Calculate the *At-The-Money Strike Price K<sub>0</sub>* `CBOE_K_0()`
+-   *Select* the Option Quotes Q(K<sub>i</sub>) according to the CBOE
     Rule `CBOE_option_selection()`
-  - Calculate the *Implied Variance σ<sup>2</sup>* `CBOE_sigma_sq()`
-  - Do all of the above in one function `CBOE_VIX_variables()`
-  - Interpolate the **VIX** using two Implied Variances
+-   Calculate the *Implied Variance σ<sup>2</sup>* `CBOE_sigma_sq()`
+-   Do all of the above in one function `CBOE_VIX_variables()`
+-   Interpolate the **VIX** using two Implied Variances
     `CBOE_VIX_index()`
-  - Calculate *Option Descriptives* `option_descriptives()`
+-   Calculate *Option Descriptives* `option_descriptives()`
 
 **2. Processing a whole dataset (using data.table)**
 
-  - Automatically determine the *Expiration Terms* (“near-” and
+-   Automatically determine the *Expiration Terms* (“near-” and
     “next-term”) `CBOE_interpolation_terms()`
-  - Create the implied Variance (and VIX variables) for a whole dataset
-  - Interpolate the weekly or monthly VIX index
+-   Create the implied Variance (and VIX variables) for a whole dataset
+-   Interpolate the weekly or monthly VIX index
 
 **3. Visualise the VIX-Index**
 
-  - As single plot `plot_VIX()`
-  - Browse through plots of multiple tickers with an *interactive Shiny
+-   As single plot `plot_VIX()`
+-   Browse through plots of multiple tickers with an *interactive Shiny
     App* `result_browser()`
 
 **4. Analyse the Option-Data Quality**
 
-  - Calculate Option Descriptives for the whole
+-   Calculate Option Descriptives for the whole
     dataset`option_descriptives()`
-  - Visualise the option data quality \[to be done\]
+-   Visualise the option data quality \[to be done\]
 
 **5. Improve Option-Data Quality using Smooting Methods**
 
-## 1\. Short Walkthrough
+-   Intra- and Extrapolate option quotes `JandT_2007_smoothing_method()`
+-   Calculate the Jiang & Tian MFIV `JandT_2007_sigma_sq()`
+
+## 1. Short Walkthrough
 
 Load exemplary package data
 
@@ -89,12 +92,11 @@ option_dataset
 #> 12870:   BBBB 2017-06-13 16:00:00 2019-01-18 980.805 <data.table[117x3]>
 ```
 
-We select an exemplary entry as an example. This observation will be our
-“near-term” contract. Also note that `option_quotes` is a “nested”
-data.table itself
+We select an exemplary entry for the calculation. This observation will
+be our “near-term” contract. Also note that `option_quotes` is a
+“nested” data.table itself
 
 ``` r
-
 t <- option_dataset$t[4]
 exp <- option_dataset$exp[4]
 option_quotes <- option_dataset$option_quotes[[4]]
@@ -160,8 +162,8 @@ Next we calculate the Risk-Free-Rate R
 ``` r
 library(lubridate)
 #> 
-#> Attaching package: 'lubridate'
-#> The following objects are masked from 'package:base':
+#> Attache Paket: 'lubridate'
+#> Die folgenden Objekte sind maskiert von 'package:base':
 #> 
 #>     date, intersect, setdiff, union
 R <- interpolate_rfr(date = as_date(t),
@@ -241,7 +243,7 @@ option_quotes
 #>         K      c      p
 ```
 
-Optionally calculate the Implied Variance σ<sup>2</sup>
+Calculate the Implied Variance σ<sup>2</sup>
 
 ``` r
 sigma_sq <- CBOE_sigma_sq(sel_option_quotes = option_quotes,
@@ -309,8 +311,8 @@ CBOE_VIX_index(maturity = c(maturity, maturity2),
 #> [1] 22.91347
 ```
 
-Calculate Option Descriptives, i.e. the strike price range and spacing
-in standard-deviation (SD) units of the used option quotes:
+Optionally calculate Option Descriptives, i.e. the strike price range
+and spacing in standard-deviation (SD) units of the used option quotes:
 
 ``` r
 price <- option_dataset$price[4]
@@ -338,15 +340,14 @@ option_descriptives(option_quotes = option_quotes,
 #> [1] 10
 ```
 
-## 2\. Processing a whole dataset (using `data.table` and `future.apply`)
+## 2. Processing a whole dataset (using `data.table` and `future.apply`)
 
 To speed up the calculations, we employ parallelised versions of the
 `apply` family. However, you can still use the standard ones.
 
 ``` r
 library(future.apply)
-#> Warning: package 'future.apply' was built under R version 4.0.3
-#> Loading required package: future
+#> Lade nötiges Paket: future
 plan(multisession, workers = 4) ## Parallelize using four cores
 ```
 
@@ -360,12 +361,13 @@ option_dataset[, maturity := time_length((exp + hours(16) - t),unit = "years")]
 
 ## Weekly and monthly expiration terms
 option_dataset[, `:=`(term_wk = future_sapply(maturity, CBOE_interpolation_terms,
-                                              method = "weekly"),
+                                              method = "weekly",
+                                              future.seed = 1337),
                       term_mn = future_mapply(CBOE_interpolation_terms,
                                               maturity, as_date(t), as_date(exp),
-                                              MoreArgs = list(method = "monthly"))
+                                              MoreArgs = list(method = "monthly"),
+                                              future.seed = 1337)
 )]
-
 ## Select only options needed for the weekly and monthly VIX
 option_dataset <- option_dataset[!is.na(term_wk)
                                  | !is.na(term_mn)]
@@ -405,7 +407,8 @@ option_dataset[, `:=`(R = interpolate_rfr(date = as_date(t),
                                           exp = exp))]
 
 ## Calculate CBOE MFIV for the whole dataset
-option_dataset[, sigma_sq := future_mapply(CBOE_VIX_vars, option_quotes, R, maturity)]
+option_dataset[, sigma_sq := future_mapply(CBOE_VIX_vars, option_quotes, R, maturity, future.seed = 1337)
+               ]
 option_dataset
 #>       ticker                   t        exp   price       option_quotes
 #>    1:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
@@ -447,7 +450,8 @@ multicols <- function(matrix){
 option_dataset[, c("F_0", "K_0", "n_put_raw", "n_call_raw", "n_put", "n_call", "sigma_sq") := 
                  multicols(future_mapply(CBOE_VIX_vars,
                                          option_quotes, R, maturity,
-                                         MoreArgs = list(ret_vars = T))
+                                         MoreArgs = list(ret_vars = T),
+                                         future.seed = 1337)
                  )]
 option_dataset
 #>       ticker                   t        exp   price       option_quotes
@@ -518,7 +522,7 @@ VIX_data
 #> 780:   BBBB 2017-06-13 16:00:00 21.60340 18.07499
 ```
 
-## 3\. Visualise the VIX-Index
+## 3. Visualise the VIX-Index
 
 Display the data
 
@@ -526,12 +530,12 @@ Display the data
 plot_VIX(VIX_data)
 ```
 
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
 
 **You can use `result_browser(VIX_data)` to display an interactive Shiny
 App that allows to browse through the results**
 
-## 4\. Analyse the Option-Data Quality
+## 4. Analyse the Option-Data Quality
 
 Calculate descriptive variables for the option-data quality
 
@@ -580,15 +584,63 @@ option_dataset
 #> 3120:         38    52     38 0.2670286 1400.0   720     7.555556
 ```
 
-## 5\. Improve Option-Data Quality using Smooting Methods
+## 5. Improve Option-Data Quality using Smooting Methods
 
 ``` r
 ## Use the Jiang & Tian (2007) smoothing method to fill in and extrapolate the option quotes.
-option_dataset <- option_dataset[, option_quotes_smooth := future_mapply(JandT_2007_smoothing_method,
+option_dataset[, option_quotes_smooth := future_mapply(JandT_2007_smoothing_method,
                                                        option_quotes, K_0, price, R, maturity, F_0,
                                                        SIMPLIFY = F)]
 
 option_dataset
+#>       ticker                   t        exp   price       option_quotes
+#>    1:   AAAA 2017-06-13 09:31:00 2017-07-07 147.390  <data.table[51x3]>
+#>    2:   AAAA 2017-06-13 09:31:00 2017-07-14 147.390  <data.table[40x3]>
+#>    3:   AAAA 2017-06-13 09:31:00 2017-07-21 147.390  <data.table[42x3]>
+#>    4:   AAAA 2017-06-13 09:31:00 2017-08-18 147.390  <data.table[61x3]>
+#>    5:   AAAA 2017-06-13 09:32:00 2017-07-07 147.130  <data.table[51x3]>
+#>   ---                                                                  
+#> 3116:   BBBB 2017-06-13 15:59:00 2017-08-18 979.755  <data.table[92x3]>
+#> 3117:   BBBB 2017-06-13 16:00:00 2017-07-07 980.805  <data.table[99x3]>
+#> 3118:   BBBB 2017-06-13 16:00:00 2017-07-14 980.805  <data.table[65x3]>
+#> 3119:   BBBB 2017-06-13 16:00:00 2017-07-21 980.805 <data.table[121x3]>
+#> 3120:   BBBB 2017-06-13 16:00:00 2017-08-18 980.805  <data.table[92x3]>
+#>         maturity term_wk term_mn           R   sigma_sq      F_0 K_0 n_put_raw
+#>    1: 0.06644802       1      NA 0.008769736 0.05416683 147.5697 147        24
+#>    2: 0.08561297       2      NA 0.008911253 0.05222205 147.5497 147        15
+#>    3: 0.10477793      NA       1 0.009049549 0.05213150 147.5927 145         8
+#>    4: 0.18143775      NA       2 0.009571069 0.06150820 147.4042 145         9
+#>    5: 0.06644612       1      NA 0.008769736 0.05362052 147.2551 147        24
+#>   ---                                                                         
+#> 3116: 0.18070005      NA       2 0.009571069 0.07185948 982.6045 980        52
+#> 3117: 0.06570842       1      NA 0.008769736 0.04598859 981.3243 980        43
+#> 3118: 0.08487337       2      NA 0.008911253 0.04675662 982.0747 980        25
+#> 3119: 0.10403833      NA       1 0.009049549 0.04784626 982.4523 980        50
+#> 3120: 0.18069815      NA       2 0.009571069 0.07206823 983.2470 980        52
+#>       n_call_raw n_put n_call        SD  max_K min_K mean_delta_K
+#>    1:         10    24     10 0.2218317  167.5   123     1.308824
+#>    2:         14    15     14 0.2189827  177.5   115     2.155172
+#>    3:          9     8      9 0.2196033  190.0   100     5.294118
+#>    4:         11     9     11 0.2395117  200.0   100     5.000000
+#>    5:         10    24     10 0.2208317  167.5   123     1.308824
+#>   ---                                                            
+#> 3116:         38    52     38 0.2695806 1400.0   720     7.555556
+#> 3117:         52    43     52 0.2037625 1140.0   790     3.684211
+#> 3118:         34    25     34 0.2050042 1130.0   800     5.593220
+#> 3119:         22    50     22 0.2152011 1200.0   650     7.638889
+#> 3120:         38    52     38 0.2670286 1400.0   720     7.555556
+#>       option_quotes_smooth
+#>    1:  <data.table[244x2]>
+#>    2:  <data.table[268x2]>
+#>    3:   <data.table[99x2]>
+#>    4:  <data.table[148x2]>
+#>    5:  <data.table[242x2]>
+#>   ---                     
+#> 3116:  <data.table[511x2]>
+#> 3117:  <data.table[595x2]>
+#> 3118:  <data.table[687x2]>
+#> 3119:  <data.table[383x2]>
+#> 3120:  <data.table[512x2]>
 ```
 
 Let’s look at one nest of smoothed `option_quotes`
@@ -598,11 +650,11 @@ Let’s look at one nest of smoothed `option_quotes`
 smooth_quotes <- option_dataset$option_quotes_smooth[[1]]
 
 min(smooth_quotes$K)
-#> [1] 65
+#> [1] 26
 max(smooth_quotes$K)
-#> [1] 335
+#> [1] 269
 length(smooth_quotes$K)
-#> [1] 271
+#> [1] 244
 ## Average spacing in price units
 mean(smooth_quotes$K - data.table::shift(smooth_quotes$K), na.rm = T)
 #> [1] 1
@@ -641,4 +693,4 @@ plot_VIX(data = VIX_data_2,
                       "VIX_wk_smooth", "VIX_mn_smooth"))
 ```
 
-<img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
