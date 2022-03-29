@@ -29,22 +29,24 @@
 #' scrape_cmt_data("https://bit.ly/33XxtDC")
 #'
 scrape_cmt_data <- function(url = NULL) {
-  ## SCRAPE FULL DATASET IF NO URL IS PROVIDED
+  # SCRAPE FULL DATASET IF NO URL IS PROVIDED
   if(is.null(url)){
-    url <- "https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx?data=yieldAll"
+    url <- "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/all/all?type=daily_treasury_yield_curve&field_tdr_date_value=all&data=yieldAll&page&_format=csv"
   }
-  message(crayon::blue(lubridate::now()),
-          crayon::cyan(", DOWNLOADING AND PREPARING CMT DATA FROM "),
-          crayon::silver(url))
+  # message(crayon::blue(lubridate::now()),
+  #         crayon::cyan(", DOWNLOADING AND PREPARING CMT DATA FROM "),
+  #         crayon::silver(url))
+  #
+  # ## DOWNLOAD AND FORMAT RAW DATA
+  # table <- data.table::as.data.table(
+  #   x = rvest::html_table(
+  #     x = rvest::html_nodes(
+  #       x = xml2::read_html(url),
+  #       css = "table")
+  #   )
+  # )
 
-  ## DOWNLOAD AND FORMAT RAW DATA
-  table <- data.table::as.data.table(
-    x = rvest::html_table(
-      x = rvest::html_nodes(
-        x = xml2::read_html(url),
-        css = "table.t-chart")
-    )
-  )
+  table = data.table::fread(url)
 
   ## FUNCTION FOR CONVERSION TO NUMERIC WITHOUT WARNINGS
   numfun <- function(a){
@@ -52,8 +54,13 @@ scrape_cmt_data <- function(url = NULL) {
   }
 
   ## CONVERSION TO NUMERIC AND OUTPUT
-  cbind(table[,.(Date = lubridate::mdy(Date))], table[, lapply(X = .SD ,FUN = numfun),
+  table = cbind(table[,.(Date = lubridate::mdy(Date))], table[, lapply(X = .SD ,FUN = numfun),
                                                       .SDcols =  names(table)[2:13]])
+
+  names(table) = c("Date",  "X1.mo", "X2.mo", "X3.mo", "X6.mo", "X1.yr", "X2.yr", "X3.yr", "X5.yr", "X7.yr", "X10.yr","X20.yr","X30.yr")
+
+  data.table::setorder(table, Date)
+
 }
 
 #' Calculate risk-free-rates through cubic-spline interpolation using constant maturity

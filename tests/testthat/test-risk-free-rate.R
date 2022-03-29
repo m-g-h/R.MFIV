@@ -1,6 +1,6 @@
 test_that("scrape_cmt_data() works", {
   ## Download 2019 CMT data
-  cmt <- scrape_cmt_data("https://www.treasury.gov/resource-center/data-chart-center/interest-rates/pages/TextView.aspx?data=yieldYear&year=2019")
+  cmt <- scrape_cmt_data("https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2019/all?type=daily_treasury_yield_curve&field_tdr_date_value=2019&page&_format=csv")
 
   # ## SAVE DATA
   # saveRDS(cmt, "tests/testthat/correct_cmt")
