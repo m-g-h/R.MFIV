@@ -1,12 +1,12 @@
 Package: R.MFIV
-Title: What the Package Does (One Line, Title Case)
+Title: Calculate Model Free Implied Volatility, i.e. the CBOE VIX from Option Quotes
 Version: 0.0.1
 Authors@R: 
     person(given = "Martin Georg",
            family = "Haas",
-           role = c("aut", "cre"),
+           role = c("aut", "cre", "cph"),
            email = "haasmartin@live.de")
-Description: What the package does (one paragraph).
+Description: Provides functions to calculate the CBOE VIX, intermediary values and the Jiang & Tian (2007) smoothing method to deal with an insufficient strike price range.
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true

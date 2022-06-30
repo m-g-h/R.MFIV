@@ -82,9 +82,9 @@ option_dataset
 We select an exemplary entry for the calculation. This observation will be our "near-term" contract. Also note that `option_quotes` is a "nested" data.table itself
 ```{r}
 
-t <- option_dataset$t[4]
-exp <- option_dataset$exp[4]
-option_quotes <- option_dataset$option_quotes[[4]]
+t <- option_dataset$t[2]
+exp <- option_dataset$exp[2]
+option_quotes <- option_dataset$option_quotes[[2]]
 
 option_quotes
 ```
@@ -139,9 +139,9 @@ sigma_sq
 Do the same for a second maturity, this time all at once. This observation will be our "next-term" contract.
 ```{r}
 ## Select observation 5
-t2 <- option_dataset$t[5]
-exp2 <- option_dataset$exp[5]
-option_quotes2 <- option_dataset$option_quotes[[5]]
+t2 <- option_dataset$t[3]
+exp2 <- option_dataset$exp[3]
+option_quotes2 <- option_dataset$option_quotes[[3]]
 
 ## Risk free rate
 R2 <- interpolate_rfr(date = as_date(t2),
@@ -169,7 +169,7 @@ CBOE_VIX_index(maturity = c(maturity, maturity2),
 ```
 Optionally calculate Option Descriptives, i.e. the strike price range and spacing in standard-deviation (SD) units of the used option quotes:
 ```{r}
-price <- option_dataset$price[4]
+price <- option_dataset$price[2]
 option_descriptives(option_quotes = option_quotes,
                     K_0 = K_0,
                     R = R,

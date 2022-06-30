@@ -1,5 +1,5 @@
 ## code to prepare `option_dataset` dataset goes here
-price_data <- data.table::fread("data-raw/example_pricedata.csv")
+price_data <- data.table::fread("data-raw/example_pricedata_small.csv")
 
 option_dataset <- price_data[, .(option_quotes = list(.SD)),
                      by = .(ticker, t, exp, price=Price)]
