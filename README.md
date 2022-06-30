@@ -5,10 +5,9 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.com/m-g-h/R.MFIV.svg?branch=master)](https://travis-ci.com/m-g-h/R.MFIV)
 [![Codecov test
 coverage](https://codecov.io/gh/m-g-h/R.MFIV/branch/master/graph/badge.svg)](https://codecov.io/gh/m-g-h/R.MFIV?branch=master)
+[![R-CMD-check](https://github.com/m-g-h/R.MFIV/workflows/R-CMD-check/badge.svg)](https://github.com/m-g-h/R.MFIV/actions)
 <!-- badges: end -->
 
 R.MFIV can be installed via:
