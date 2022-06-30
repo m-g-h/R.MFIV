@@ -1,4 +1,23 @@
+
+# The functions in this file are replacements for the retired `fOptions` package.
+# I cite the documentation of the `fOptions` package:
+
+# Package:    \tab fOptions\cr
+# Type:       \tab Package\cr
+# Version:    \tab R 3.0.1\cr
+# Date:       \tab 2014\cr
+# License:    \tab GPL Version 2 or later\cr
+# Copyright:  \tab (c) 1999-2014 Rmetrics Assiciation\cr
+# URL:        \tab \url{https://www.rmetrics.org}
+
+# The functions implement algorithms to valuate plain vanilla options and to
+# compute option Greeks as described in Chapter 1 of
+# Haug E.G. (1997); The Complete Guide to Option Pricing Formulas, Chapter 1,
+# McGraw-Hill, New York.
+
+
 #' Internal function
+#' @param x \code{numeric vector}
 #' @noRd
 
 NDF =  function(x) {
@@ -17,6 +36,7 @@ NDF =  function(x) {
 }
 
 #' Internal function
+#' @param x \code{numeric vector}
 #' @noRd
 
 CND =  function(x) {
@@ -43,6 +63,15 @@ CND =  function(x) {
 }
 
 #' Internal function
+#'
+#' @param TypeFlag \code{string scalar}  either \code{"c"} for a call option or a \code{"p"} for a put option
+#' @param S \code{numeric scalar} the asset price
+#' @param X \code{numeric scalar} the exercise price
+#' @param Time \code{numeric scalar} the time to maturity measured in years
+#' @param r \code{numeric scalar} the annualized rate of interest, e.g. 0.25 means 25\% pa.
+#' @param b \code{numeric scalar} the annualized cost-of-carry rate, e.g. 0.1 means 10\% pa.
+#' @param sigma \code{numeric scalar} the annualized volatility of the underlying security, e.g. 0.3 means 30\% volatility pa.
+#'
 #' @noRd
 
 GBSOption = function(TypeFlag = c("c", "p"), S, X, Time, r, b, sigma){
@@ -70,6 +99,17 @@ GBSOption = function(TypeFlag = c("c", "p"), S, X, Time, r, b, sigma){
 }
 
 #' Internal function
+#'
+#' @param price the price of the GBS option
+#' @param TypeFlag \code{string scalar}  either \code{"c"} for a call option or a \code{"p"} for a put option
+#' @param S \code{numeric scalar} the asset price
+#' @param X \code{numeric scalar} the exercise price
+#' @param Time \code{numeric scalar} the time to maturity measured in years
+#' @param r \code{numeric scalar} the annualized rate of interest, e.g. 0.25 means 25\% pa.
+#' @param b \code{numeric scalar} the annualized cost-of-carry rate, e.g. 0.1 means 10\% pa.
+#' @param tol the maximum number of iterations and the tolerance to compute the root of the GBS volatility equation, see \code{\link[uniroot]}.
+#' @param maxiter the maximum number of iterations and the tolerance to compute the root of the GBS volatility equation, see \code{\link[uniroot]}.
+#'
 #' @noRd
 
 GBSVolatility = function(price, TypeFlag = c("c", "p"), S, X, Time, r, b,
@@ -100,6 +140,15 @@ GBSVolatility = function(price, TypeFlag = c("c", "p"), S, X, Time, r, b,
 
 
 #' Internal function
+#'
+#' @param price the price of the GBS option
+#' @param TypeFlag \code{string scalar}  either \code{"c"} for a call option or a \code{"p"} for a put option
+#' @param S \code{numeric scalar} the asset price
+#' @param X \code{numeric scalar} the exercise price
+#' @param Time \code{numeric scalar} the time to maturity measured in years
+#' @param r \code{numeric scalar} the annualized rate of interest, e.g. 0.25 means 25\% pa.
+#' @param b \code{numeric scalar} the annualized cost-of-carry rate, e.g. 0.1 means 10\% pa.
+#'
 #' @noRd
 
 .fGBSVolatility <- function(x, price, TypeFlag, S, X, Time, r, b, ...) {
