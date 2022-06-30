@@ -11,7 +11,7 @@ License: AGPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Imports:
     mathjaxr,
     lubridate,
@@ -19,7 +19,6 @@ Imports:
     crayon,
     rvest,
     xml2,
-    fOptions
 Suggests: 
     testthat (>= 2.1.0),
     covr,

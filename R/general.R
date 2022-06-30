@@ -29,7 +29,7 @@
 #'
 option_descriptives <- function(option_quotes, K_0, R, price,  maturity){
   ## ATM IV
-  SD <- fOptions::GBSVolatility(price = option_quotes[K == K_0, c],
+  SD <- GBSVolatility(price = option_quotes[K == K_0, c],
                                 TypeFlag = "c",
                                 S = price,
                                 X = K_0,

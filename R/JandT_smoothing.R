@@ -60,7 +60,6 @@
 #' from Option Prices: An Examination of the VIX Index}
 #'
 #' @import data.table
-#' @importFrom fOptions GBSVolatility GBSOption
 #' @export
 #'
 #' @examples
@@ -181,7 +180,7 @@ JandT_2007_smoothing_method <- function(option_quotes,
                      Time = maturity,
                      r =  R/maturity,
                      sigma = IV,
-                     b = b)@price
+                     b = b)
     fifelse(res < 1e-15,
             0, res)
   }
