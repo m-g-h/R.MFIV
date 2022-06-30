@@ -26,12 +26,12 @@
 #' @examples
 #'
 #' ## Scrape the CMT data for the current month:
-#' scrape_cmt_data("https://bit.ly/33XxtDC")
+#' scrape_cmt_data()
 #'
 scrape_cmt_data <- function(url = NULL) {
   # SCRAPE FULL DATASET IF NO URL IS PROVIDED
   if(is.null(url)){
-    url <- "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/all/all?type=daily_treasury_yield_curve&field_tdr_date_value=all&data=yieldAll&page&_format=csv"
+    url <- "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2019/all?type=daily_treasury_yield_curve&field_tdr_date_value=2019&page&_format=csv"
   }
   # message(crayon::blue(lubridate::now()),
   #         crayon::cyan(", DOWNLOADING AND PREPARING CMT DATA FROM "),

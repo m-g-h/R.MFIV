@@ -149,6 +149,7 @@ GBSVolatility = function(price, TypeFlag = c("c", "p"), S, X, Time, r, b,
 #' @param r \code{numeric scalar} the annualized rate of interest, e.g. 0.25 means 25\% pa.
 #' @param b \code{numeric scalar} the annualized cost-of-carry rate, e.g. 0.1 means 10\% pa.
 #'
+#' @importFrom stats uniroot
 #' @noRd
 
 .fGBSVolatility <- function(x, price, TypeFlag, S, X, Time, r, b, ...) {

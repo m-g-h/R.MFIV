@@ -34,6 +34,6 @@ This data can be retrieved from the \href{https://www.treasury.gov/resource-cent
 \examples{
 
 ## Scrape the CMT data for the current month:
-scrape_cmt_data("https://bit.ly/33XxtDC")
+scrape_cmt_data()
 
 }
