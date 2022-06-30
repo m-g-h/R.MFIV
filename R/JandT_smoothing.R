@@ -18,7 +18,7 @@
 #'
 #' Jiang & Tian (2007) define the range and increment of the strike prices in \mjseqn{SD}
 #' units. This \mjseqn{SD} is the Black & Scholes implied volatility of the at-the-money
-#' option. As an example, the increment recommended by Jiang & Tian (2007) is mjseqn{0.35}
+#' option. As an example, the increment recommended by Jiang & Tian (2007) is \mjseqn{0.35}
 #' units: \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}. The range is calculated
 #' accordingly as \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot}\code{ tail_length}.
 #'
@@ -215,7 +215,7 @@ JandT_2007_smoothing_method <- function(option_quotes,
 #' @inheritParams CBOE_option_selection
 #' @inheritParams CBOE_F_0
 #' @inheritParams CBOE_K_0
-#' @param smooth_option_quotes A \code{data.table} or "nest" of option quotes as retured
+#' @param smooth_option_quotes A \code{data.table} or "nest" of option quotes as returned
 #' from \code{\link{JandT_2007_smoothing_method}}
 #'
 #' @return Returns a \code{numeric scalar}: the model-free implied volatility \mjseqn{\sigma^2} as

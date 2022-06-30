@@ -64,7 +64,7 @@ sections
     dataset`option_descriptives()`
 -   Visualise the option data quality \[to be done\]
 
-**5. Improve Option-Data Quality using Smooting Methods**
+**5. Improve Option-Data Quality using Smoothing Methods**
 
 -   Intra- and Extrapolate option quotes `JandT_2007_smoothing_method()`
 -   Calculate the Jiang & Tian MFIV `JandT_2007_sigma_sq()`
@@ -600,7 +600,7 @@ option_dataset
 #> 3120:         38    52     38 0.2670286 1400.0   720     7.555556
 ```
 
-## 5. Improve Option-Data Quality using Smooting Methods
+## 5. Improve Option-Data Quality using Smoothing Methods
 
 ``` r
 ## Use the Jiang & Tian (2007) smoothing method to fill in and extrapolate the option quotes.

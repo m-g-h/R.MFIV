@@ -16,7 +16,7 @@ Each cell in this column contains a \code{data.table} with the following columns
 \itemize{
 \item{\strong{K}  (\code{numeric})}{ - the strike price}
 \item{\strong{c}  (\code{numeric})}{ - the corresponding call price}
-\item{\strong{p}  (\code{numeric})}{ - the correspondign put price}
+\item{\strong{p}  (\code{numeric})}{ - the corresponding put price}
 }
 }
 }

@@ -1,4 +1,4 @@
-#' Calculate descriptive variables fo a nest of option quotes
+#' Calculate descriptive variables for a nest of option quotes
 #' @inheritParams CBOE_F_0
 #' @inheritParams CBOE_option_selection
 #' @param price \code{numeric scalar} giving the underlying stock price.

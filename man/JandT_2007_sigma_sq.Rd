@@ -7,7 +7,7 @@
 JandT_2007_sigma_sq(smooth_option_quotes, K_0, maturity, R)
 }
 \arguments{
-\item{smooth_option_quotes}{A \code{data.table} or "nest" of option quotes as retured
+\item{smooth_option_quotes}{A \code{data.table} or "nest" of option quotes as returned
 from \code{\link{JandT_2007_smoothing_method}}}
 
 \item{K_0}{\code{numeric scalar}, giving the theoretical at-the-money strike price

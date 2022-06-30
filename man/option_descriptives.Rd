@@ -2,7 +2,7 @@
 % Please edit documentation in R/general.R
 \name{option_descriptives}
 \alias{option_descriptives}
-\title{Calculate descriptive variables fo a nest of option quotes}
+\title{Calculate descriptive variables for a nest of option quotes}
 \usage{
 option_descriptives(option_quotes, K_0, R, price, maturity)
 }
@@ -37,7 +37,7 @@ Returns a \code{list} with the following variables:
 }
 }
 \description{
-Calculate descriptive variables fo a nest of option quotes
+Calculate descriptive variables for a nest of option quotes
 }
 \examples{
 
