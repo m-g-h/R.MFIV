@@ -25,7 +25,7 @@ Returns a \code{numeric scalar}, giving the theoretical at-the-money
 forward \mjseqn{F_0}
 }
 \description{
-Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper} this function
+Following the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper} this function
 calculates \mjseqn{F_0} as:
 
 \mjsdeqn{F_0 := Strike Price + e^{RT} (Call Price - Put Price)}

@@ -54,6 +54,6 @@ sigma_sq <- JandT_2007_sigma_sq(smooth_option_quotes = smooth_nest,
                                 R = 0.008325593)
 }
 \references{
-\href{https://doi.org/10.3905/jod.2007.681813}{Jiang & Tian (2007) -
-Extracting Model-Free Volatility}
+\doi{10.3905/jod.2007.681813} Jiang & Tian (2007) - Extracting Model-Free
+Volatility
 }

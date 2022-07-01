@@ -28,7 +28,7 @@ Returns a \code{data.table} with three columns:
 \description{
 \loadmathjax
 This function performs the selection of out-of-the-money options as explained in the
-\href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}:
+\href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper}:
 \emph{"Select out-of-the-money put options with strike prices \mjseqn{< K_0}. Start with the put strike
 immediately lower than K0 and move to successively lower strike prices. Exclude any put option
 that has a bid price equal to zero (i.e., no bid). As shown below, once two puts with consecutive

@@ -27,7 +27,7 @@ per the CBOE formula above.
 }
 \description{
 This function performs the CBOE VIX model-free implied variance calculation
-according to the following formula from the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{2019 VIX whitepaper}:
+according to the following formula from the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2019 VIX whitepaper}:
 \loadmathjax
 \mjsdeqn{\sigma^2 = \frac{2}{T} \left(\sum_i \frac{\Delta K_i}{K_i^2} Q(K_i) e^{rT} \right) - \frac{1}{T} \left( \frac{F_0}{K_0} - 1 \right)^2}
 It uses \code{\link{CBOE_delta_K}} internally to derive the weights \mjseqn{\Delta K_i}

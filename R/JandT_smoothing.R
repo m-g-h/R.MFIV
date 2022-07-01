@@ -52,12 +52,11 @@
 #' }
 #'
 #' @references
-#' \href{https://doi.org/10.1093/RFS%2FHHI027}{Jiang & Tian (2005) -
-#' The Model-Free Implied Volatility and Its Information Content}
+#' \doi{10.1093/rfs/hhi027} Jiang & Tian (2005) - The Model-Free Implied
+#'  Volatility and Its Information Content
 #'
-#' \href{https://doi.org/10.3905/jod.2007.681813}{Jiang & Tian (2007) -
-#'  Extracting Model-Free Volatility
-#' from Option Prices: An Examination of the VIX Index}
+#' \doi{10.3905/jod.2007.681813} Jiang & Tian (2007) - Extracting Model-Free
+#' Volatility  from Option Prices: An Examination of the VIX Index
 #'
 #' @import data.table
 #' @export
@@ -224,8 +223,8 @@ JandT_2007_smoothing_method <- function(option_quotes,
 #'
 #' @references
 #'
-#' \href{https://doi.org/10.3905/jod.2007.681813}{Jiang & Tian (2007) -
-#'  Extracting Model-Free Volatility}
+#' \doi{10.3905/jod.2007.681813} Jiang & Tian (2007) - Extracting Model-Free
+#' Volatility
 #'
 #' @importFrom data.table shift fcase
 #'

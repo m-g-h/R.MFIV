@@ -20,7 +20,7 @@ Returns a \code{data.table} containing the following columns:
 }
 }
 \description{
-According to the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{2019 VIX whitepaper},
+According to the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2019 VIX whitepaper},
 \emph{"the risk-free interest rates, R1 and R2, are yields based on U.S. Treasury yield curve
 rates (commonly referred to as "Constant Maturity Treasury", rates or CMTs), to which a
 cubic spline is applied to derive yields on the expiration dates of relevant SPX options.

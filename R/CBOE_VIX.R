@@ -1,7 +1,7 @@
 #' Calculate the theoretical at-the-money forward \mjseqn{F_0} from the CBOE VIX calculation.
 #' \loadmathjax
 #'
-#' @description Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper} this function
+#' @description Following the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper} this function
 #' calculates \mjseqn{F_0} as:
 #'
 #' \mjsdeqn{F_0 := Strike Price + e^{RT} (Call Price - Put Price)}
@@ -42,7 +42,7 @@ CBOE_F_0 <- function(option_quotes, R, maturity){
 #' calculation.
 #' \loadmathjax
 #'
-#' @description Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}
+#' @description Following the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper}
 #' \mjseqn{K_0} is defined as the strike price directly smaller or equal to the
 #' theoretical at-the-money forward price \mjseqn{F_0}
 #'
@@ -80,7 +80,7 @@ CBOE_K_0 <- function(option_quotes, F_0){
 #'
 #' \loadmathjax
 #' This function performs the selection of out-of-the-money options as explained in the
-#' \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}:
+#' \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper}:
 #' \emph{"Select out-of-the-money put options with strike prices \mjseqn{< K_0}. Start with the put strike
 #' immediately lower than K0 and move to successively lower strike prices. Exclude any put option
 #' that has a bid price equal to zero (i.e., no bid). As shown below, once two puts with consecutive
@@ -112,7 +112,7 @@ CBOE_option_selection <- function(option_quotes, K_0){
 
 #' Calculate the average strike price distance variable \mjseqn{\Delta K_i} from the CBOE VIX calculation.
 #'
-#' Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper} this function
+#' Following the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper} this function
 #' calculates \mjseqn{\Delta K_i} as \emph{"half the difference between the strike prices on either side of
 #' \mjseqn{K_i}"}:
 #' \loadmathjax
@@ -145,7 +145,7 @@ CBOE_delta_K <- function(K){
                              (K-shift(K, type = "lag")),
                              (shift(K, type = "lead") - shift(K, type = "lag"))/2
                      )),silent = T)
-  if(class(ret)== "try-error"){
+  if(inherits(ret, "try-error")){
     NA_real_
   } else {
     ret}
@@ -154,7 +154,7 @@ CBOE_delta_K <- function(K){
 #' Calculate the CBOE VIX model free variance \mjseqn{\sigma^2}
 #'
 #' @description This function performs the CBOE VIX model-free implied variance calculation
-#' according to the following formula from the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{2019 VIX whitepaper}:
+#' according to the following formula from the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2019 VIX whitepaper}:
 #' \loadmathjax
 #' \mjsdeqn{\sigma^2 = \frac{2}{T} \left(\sum_i \frac{\Delta K_i}{K_i^2} Q(K_i) e^{rT} \right) - \frac{1}{T} \left( \frac{F_0}{K_0} - 1 \right)^2}
 #' It uses \code{\link{CBOE_delta_K}} internally to derive the weights \mjseqn{\Delta K_i}
@@ -196,7 +196,7 @@ CBOE_sigma_sq <- function(sel_option_quotes, K_0, F_0, maturity, R){
 #'
 #' @description This is a wrapper around the \code{CBOE_...} functions that performs the calculation
 #' of all variables required for the calculation of the squared model free implied volatility (\mjseqn{\sigma^2})
-#' as per the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}:
+#' as per the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper}:
 #'
 #' \loadmathjax
 #' \mjsdeqn{\sigma^2 = \frac{2}{T} \left(\sum_i \frac{\Delta K_i}{K_i^2} Q(K_i) e^{rT} \right) - \frac{1}{T} \left( \frac{F_0}{K_0} - 1 \right)^2}
@@ -352,8 +352,8 @@ CBOE_VIX_vars <- function(option_quotes, R, maturity,
 #' This function determines the interpolation terms used for the VIX.
 #' It provides terms for the two different interpolation techniques used by the CBOE:
 #' \itemize{
-#'   \item {\strong{2003 VIX} (monthly):} {using monthly options (see the \href{https://web.archive.org/web/20091231021416/https://www.cboe.com/micro/vix/vixwhite.pdf}{2009 CBOE Whitepaper})}
-#'   \item {\strong{2014 VIX} (weekly):} {using weekly  options (see the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{2019 VIX whitepaper})}
+#'   \item {\strong{2003 VIX} (monthly):} {using monthly options (see the \href{https://web.archive.org/web/20091231021416/https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2009 CBOE Whitepaper})}
+#'   \item {\strong{2014 VIX} (weekly):} {using weekly  options (see the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2019 VIX whitepaper})}
 #' }
 #'
 #' Both methods rely on a "near-term" and a "next-term" contract.
@@ -404,7 +404,7 @@ CBOE_interpolation_terms <- function(maturity, date_t, date_exp, method){
 #' annualised VIX index in percentage points
 #'
 #' \loadmathjax
-#' Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}, the VIX index is
+#' Following the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper}, the VIX index is
 #' calculated as a linear interpolation. This function uses the following formula:
 #' \mjsdeqn{\sigma_{VIX} =  100 \sqrt{ \big( \omega T_1 \sigma_1^2 + (1- \omega) T_2 \sigma_2^2 \big) \frac{525,600}{43,200} }}
 #' where the subscripts \mjseqn{1} and \mjseqn{2} indicate the near-and next-term options, \mjseqn{T_\cdot}

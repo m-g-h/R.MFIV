@@ -13,7 +13,7 @@ CBOE_delta_K(K)
 Returns a \code{numeric vector} giving the \mjseqn{\Delta K_i} variable of the CBOE VIX calculation.
 }
 \description{
-Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper} this function
+Following the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper} this function
 calculates \mjseqn{\Delta K_i} as \emph{"half the difference between the strike prices on either side of
 \mjseqn{K_i}"}:
 \loadmathjax

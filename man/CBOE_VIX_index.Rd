@@ -20,7 +20,7 @@ Returns a \code{numeric scalar} giving the VIX index value
 }
 \description{
 \loadmathjax
-Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}, the VIX index is
+Following the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper}, the VIX index is
 calculated as a linear interpolation. This function uses the following formula:
 \mjsdeqn{\sigma_{VIX} =  100 \sqrt{ \big( \omega T_1 \sigma_1^2 + (1- \omega) T_2 \sigma_2^2 \big) \frac{525,600}{43,200} }}
 where the subscripts \mjseqn{1} and \mjseqn{2} indicate the near-and next-term options, \mjseqn{T_\cdot}

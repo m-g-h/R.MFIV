@@ -43,7 +43,7 @@ involved in the calculation:
 \description{
 This is a wrapper around the \code{CBOE_...} functions that performs the calculation
 of all variables required for the calculation of the squared model free implied volatility (\mjseqn{\sigma^2})
-as per the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}:
+as per the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper}:
 
 \loadmathjax
 \mjsdeqn{\sigma^2 = \frac{2}{T} \left(\sum_i \frac{\Delta K_i}{K_i^2} Q(K_i) e^{rT} \right) - \frac{1}{T} \left( \frac{F_0}{K_0} - 1 \right)^2}

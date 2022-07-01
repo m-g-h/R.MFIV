@@ -24,7 +24,7 @@ Returns a \code{numeric scalar}, giving the theoretical at-the-money
 strike \mjseqn{K_0}
 }
 \description{
-Following the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{VIX whitepaper}
+Following the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper}
 \mjseqn{K_0} is defined as the strike price directly smaller or equal to the
 theoretical at-the-money forward price \mjseqn{F_0}
 }

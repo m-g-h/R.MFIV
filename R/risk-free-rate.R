@@ -1,6 +1,6 @@
 #' Scrape the CMT data form the US Treasury website
 #'
-#' @description According to the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{2019 VIX whitepaper},
+#' @description According to the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2019 VIX whitepaper},
 #' \emph{"the risk-free interest rates, R1 and R2, are yields based on U.S. Treasury yield curve
 #' rates (commonly referred to as "Constant Maturity Treasury", rates or CMTs), to which a
 #' cubic spline is applied to derive yields on the expiration dates of relevant SPX options.
@@ -66,7 +66,7 @@ scrape_cmt_data <- function(url = NULL) {
 #' Calculate risk-free-rates through cubic-spline interpolation using constant maturity
 #' treasury (CMT) rates data.
 #'
-#' @description According to the \href{https://www.cboe.com/micro/vix/vixwhite.pdf}{2019 VIX whitepaper},
+#' @description According to the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2019 VIX whitepaper},
 #' \emph{"the risk-free interest rates, R1 and R2, are yields based on U.S. Treasury yield curve
 #' rates (commonly referred to as "Constant Maturity Treasury", rates or CMTs), to which a
 #' cubic spline is applied to derive yields on the expiration dates of relevant SPX options.

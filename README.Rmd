@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 # R.MFIV <img src="man/figures/hex_small.svg" align="right" />
 
 <!-- badges: start -->
-[![Codecov test coverage](https://codecov.io/gh/m-g-h/R.MFIV/branch/master/graph/badge.svg)](https://codecov.io/gh/m-g-h/R.MFIV?branch=master)
+[![Codecov test coverage](https://codecov.io/gh/m-g-h/R.MFIV/branch/master/graph/badge.svg)](https://app.codecov.io/gh/m-g-h/R.MFIV?branch=master)
 [![R-CMD-check](https://github.com/m-g-h/R.MFIV/workflows/R-CMD-check/badge.svg)](https://github.com/m-g-h/R.MFIV/actions)
 <!-- badges: end -->
 
@@ -34,7 +34,7 @@ The VIX is defined as:
 knitr::include_graphics("man/figures/VIX_formulas.PNG")
 ```
 
-where the term in brackets under the square root is a linear interpolation of two Implied Variances, which are given by the second formula. The CBOE approach of the VIX calculation is explained in the [CBOE VIX Whitepaper](http://www.cboe.com/micro/vix/vixwhite.pdf).
+where the term in brackets under the square root is a linear interpolation of two Implied Variances, which are given by the second formula. The CBOE approach of the VIX calculation is explained in the [CBOE VIX Whitepaper](https://cdn.cboe.com/resources/vix/vixwhite.pdf).
 
 In order to calculate the VIX and its individual variables, this package provides the following functionality as explained in the following sections
 
