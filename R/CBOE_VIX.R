@@ -12,9 +12,9 @@
 #'
 #' @param option_quotes A \code{data.table} or "nest" of option quotes with three columns:
 #' \itemize{
-#'   \item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
-#'   \item {\strong{c} (\code{numeric})}{ - call option price}
-#'   \item {\strong{p} (\code{numeric})}{ - put option price}
+#'   \item {\strong{K} (\code{numeric})} - strike price in ascending order
+#'   \item {\strong{c} (\code{numeric})} - call option price
+#'   \item {\strong{p} (\code{numeric})} - put option price
 #' }
 #' @param R \code{numeric scalar} giving the risk-free rate \mjseqn{R} corresponding to the
 #' maturity \mjseqn{T} in decimal
@@ -93,9 +93,9 @@ CBOE_K_0 <- function(option_quotes, F_0){
 #'
 #' @return Returns a \code{data.table} with three columns:
 #' \itemize{
-#'   \item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
-#'   \item {\strong{c} (\code{numeric})}{ - call option price}
-#'   \item {\strong{p} (\code{numeric})}{ - put option price}
+#'   \item {\strong{K} (\code{numeric})} - strike price in ascending order
+#'   \item {\strong{c} (\code{numeric})} - call option price
+#'   \item {\strong{p} (\code{numeric})} - put option price
 #' } which is filtered according to the CBOE rules
 #'
 #' @importFrom utils tail head
@@ -144,7 +144,7 @@ CBOE_delta_K <- function(K){
                      fifelse(n==N,
                              (K-shift(K, type = "lag")),
                              (shift(K, type = "lead") - shift(K, type = "lag"))/2
-                     )),silent = T)
+                     )),silent = TRUE)
   if(inherits(ret, "try-error")){
     NA_real_
   } else {
@@ -208,17 +208,17 @@ CBOE_sigma_sq <- function(sel_option_quotes, K_0, F_0, maturity, R){
 #' @return Returns either a \code{numeric scalar} giving \mjseqn{\sigma^2} or a \code{list} with all variables
 #' involved in the calculation:
 #' \itemize{
-#'   \item {\strong{F_0} (\code{numeric})}{ - theoretical at-the money forward \mjseqn{F_0}
-#'    (see \code{\link{CBOE_F_0}})}
-#'   \item {\strong{K_0} (\code{numeric})}{ - theoretical at-the money strike \mjseqn{K_0}
-#'    (see \code{\link{CBOE_K_0}})}
-#'   \item {\strong{n_put_raw} (\code{numeric})}{ - number of put options before option selection
-#'    (see \code{\link{CBOE_option_selection}})}
-#'   \item {\strong{n_call_raw} (\code{numeric})}{ - number of call options before option selection
-#'    (see \code{\link{CBOE_option_selection}})}
-#'   \item {\strong{n_put} (\code{numeric})}{ - number of put options after option selection}
-#'   \item {\strong{n_call} (\code{numeric})}{ - number of call options after option selection}
-#'   \item {\strong{sigma_sq} (\code{numeric})}{ - squared model free implied volatility \mjseqn{\sigma^2}
+#'   \item {\strong{F_0} (\code{numeric})} - theoretical at-the money forward \mjseqn{F_0}
+#'    (see \code{\link{CBOE_F_0}})
+#'   \item {\strong{K_0} (\code{numeric})} - theoretical at-the money strike \mjseqn{K_0}
+#'    (see \code{\link{CBOE_K_0}})
+#'   \item {\strong{n_put_raw} (\code{numeric})} - number of put options before option selection
+#'    (see \code{\link{CBOE_option_selection}})
+#'   \item {\strong{n_call_raw} (\code{numeric})} - number of call options before option selection
+#'    (see \code{\link{CBOE_option_selection}})
+#'   \item {\strong{n_put} (\code{numeric})} - number of put options after option selection
+#'   \item {\strong{n_call} (\code{numeric})} - number of call options after option selection
+#'   \item {\strong{sigma_sq} (\code{numeric})} - squared model free implied volatility \mjseqn{\sigma^2
 #'    (see \code{\link{CBOE_sigma_sq}})}
 #' }
 #' @export
@@ -234,7 +234,7 @@ CBOE_sigma_sq <- function(sel_option_quotes, K_0, F_0, maturity, R){
 #'               ret_vars = TRUE)
 #'
 CBOE_VIX_vars <- function(option_quotes, R, maturity,
-                          ret_vars = F){
+                          ret_vars = FALSE){
   ## Stop if there are two or less quotes
   if(nrow(option_quotes) < 2){
     warning(crayon::silver("NA "),
@@ -352,8 +352,8 @@ CBOE_VIX_vars <- function(option_quotes, R, maturity,
 #' This function determines the interpolation terms used for the VIX.
 #' It provides terms for the two different interpolation techniques used by the CBOE:
 #' \itemize{
-#'   \item {\strong{2003 VIX} (monthly):} {using monthly options (see the \href{https://web.archive.org/web/20091231021416/https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2009 CBOE Whitepaper})}
-#'   \item {\strong{2014 VIX} (weekly):} {using weekly  options (see the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2019 VIX whitepaper})}
+#'   \item {\strong{2003 VIX} (monthly):} using monthly options (see the \href{https://web.archive.org/web/20091231021416/https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2009 CBOE Whitepaper})
+#'   \item {\strong{2014 VIX} (weekly):} using weekly  options (see the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2019 VIX whitepaper})
 #' }
 #'
 #' Both methods rely on a "near-term" and a "next-term" contract.

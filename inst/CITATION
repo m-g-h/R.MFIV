@@ -1,0 +1,12 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "Implementing Intraday Model-Free Implied Volatility for Individual Equities to Analyze the Return–Volatility Relationship",
+  author   = c(person(given = c("Martin", "G."), family = "Haas"),
+               person(given = c("Franziska", "J."), family = "Peter")),
+  journal  = "Journal of Risk and Financial Management",
+  year     = "2024",
+  volume   = "17",
+  number   = "1",
+  pages    = "39",
+  doi      = "https://doi.org/10.3390/jrfm17010039"
+)

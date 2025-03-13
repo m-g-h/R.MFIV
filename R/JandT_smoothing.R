@@ -35,20 +35,20 @@
 #' @param increment \code{character or numeric scalar} giving the strike-price increment
 #' of the returned option quotes in \mjseqn{SD} units (see details). Options are:
 #' \itemize{
-#'   \item {\strong{x} (\code{numeric})}{ - any number giving the strike-price increment
-#'   in price units}
-#'   \item {\strong{"JT"} (\code{character})}{ - the increment from Jiang & Tian (2007)
-#'   i.e. \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}}
-#'   \item {\strong{"real"} (\code{character})}{ - the smallest increment found in the
-#'   "real" data}
-#'   \item {\strong{"min"} (\code{character})}{ - the smaller one of "JT" and "min"}
+#'   \item {\strong{x} (\code{numeric})} - any number giving the strike-price increment
+#'   in price units
+#'   \item {\strong{"JT"} (\code{character})} - the increment from Jiang & Tian (2007)
+#'   i.e. \mjseqn{SD \cdot \sqrt{maturity} \cdot price \cdot 0.35}
+#'   \item {\strong{"real"} (\code{character})} - the smallest increment found in the
+#'   "real" data
+#'   \item {\strong{"min"} (\code{character})} - the smaller one of "JT" and "min"
 #' }
 #' The increment is at least 0.5, unless a numeric value is provided.
 #' @return Returns a \code{data.table} of intra- and extrapolated option quotes with the
 #' following columns:
 #' \itemize{
-#'   \item {\strong{K} (\code{numeric})}{ - evenly spaced strike price in ascending order}
-#'   \item {\strong{Q} (\code{numeric})}{ - OTM option price}
+#'   \item {\strong{K} (\code{numeric})} - evenly spaced strike price in ascending order
+#'   \item {\strong{Q} (\code{numeric})} - OTM option price
 #' }
 #'
 #' @references
@@ -78,7 +78,7 @@
 
 JandT_2007_smoothing_method <- function(option_quotes,
                                         K_0, price, R, maturity, F_0,
-                                        tail_length = 15, flat_tails = T,
+                                        tail_length = 15, flat_tails = TRUE,
                                         increment = "min"){
 
   ## Select OTM option quotes and calculate corresponding B&S IV

@@ -10,9 +10,9 @@ CBOE_F_0(option_quotes, R, maturity)
 \arguments{
 \item{option_quotes}{A \code{data.table} or "nest" of option quotes with three columns:
 \itemize{
-\item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
-\item {\strong{c} (\code{numeric})}{ - call option price}
-\item {\strong{p} (\code{numeric})}{ - put option price}
+  \item {\strong{K} (\code{numeric})} - strike price in ascending order
+  \item {\strong{c} (\code{numeric})} - call option price
+  \item {\strong{p} (\code{numeric})} - put option price
 }}
 
 \item{R}{\code{numeric scalar} giving the risk-free rate \mjseqn{R} corresponding to the
@@ -22,7 +22,7 @@ maturity \mjseqn{T} in decimal}
 }
 \value{
 Returns a \code{numeric scalar}, giving the theoretical at-the-money
-forward \mjseqn{F_0}
+ forward \mjseqn{F_0}
 }
 \description{
 Following the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper} this function

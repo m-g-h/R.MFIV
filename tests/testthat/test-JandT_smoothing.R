@@ -8,8 +8,7 @@ test_that("JandT_2007_smoothing_method() works", {
   flat_tails <- c(T, F)
   increment <- c("min", "JT", "real", 0.5)
 
-  params <- purrr::reduce(.x = purrr::cross3(tail_length, flat_tails, increment),
-                          .f = rbind)
+  params <- tidyr::expand_grid(tail_length, flat_tails, increment)
   rownames(params) <- NULL
 
   runfun <- function(option_quotes, K_0, price, R, maturity, F_0,
@@ -23,9 +22,9 @@ test_that("JandT_2007_smoothing_method() works", {
                                 tail_length, flat_tails, increment)
   }
 
-  extra_data <- purrr::pmap(.l = list("tail_length" = params[,1],
-                                      "flat_tails" = params[,2],
-                                      "increment" = params[,3]),
+  extra_data <- purrr::pmap(.l = list("tail_length" = params$tail_length,
+                                      "flat_tails" = params$flat_tails,
+                                      "increment" = params$increment),
                             .f = runfun,
                             option_quotes = nest,
                             maturity = 0.008953152,

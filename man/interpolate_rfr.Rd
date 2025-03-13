@@ -5,7 +5,7 @@
 \title{Calculate risk-free-rates through cubic-spline interpolation using constant maturity
 treasury (CMT) rates data.}
 \usage{
-interpolate_rfr(cmt_data = NULL, date, exp, ret_table = F)
+interpolate_rfr(cmt_data = NULL, date, exp, ret_table = FALSE)
 }
 \arguments{
 \item{cmt_data}{A \code{data.table} containing CMT quotes. See \code{\link{cmt_dataset}} for an example
@@ -21,9 +21,9 @@ table with the original \code{date}, \code{exp} and the corresponding risk-free-
 \value{
 Returns either a \code{numeric vector} of risk free rates or a \code{data.table} containing:
 \itemize{
-\item{\strong{date}(\code{date})}{ - the provided starting dates}
-\item{\strong{exp} (\code{date})}{ - the provided expiration dates}
-\item{\strong{R}   (\code{numeric})}{ - the corresponding risk-free interest rates in \emph{decimal}}
+  \item{\strong{date}(\code{date})} - the provided starting dates
+  \item{\strong{exp} (\code{date})} - the provided expiration dates
+  \item{\strong{R}   (\code{numeric})} - the corresponding risk-free interest rates in \emph{decimal}
 }
 }
 \description{

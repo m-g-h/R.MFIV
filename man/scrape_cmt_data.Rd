@@ -14,9 +14,8 @@ Also accepts links from this website with other selections than "All", see e.g. 
 \value{
 Returns a \code{data.table} containing the following columns:
 \itemize{
-\item{Date (\code{date})}{ - the day of the observation}
-\item{maturity A (\code{numeric}, \emph{decimal})}{ - the CMT rate for the respective maturity in decimal}
-\item{...}
+  \item{Date (\code{date})} - the day of the observation
+  \item{maturity A (\code{numeric}, \emph{decimal})} - the CMT rate for the respective maturity in decimal
 }
 }
 \description{

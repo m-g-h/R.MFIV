@@ -5,13 +5,13 @@
 #'
 #' @return Returns a \code{list} with the following variables:
 #' \itemize{
-#'   \item {\strong{SD} (\code{numeric})}{- the Black Merton Scholes implied volatility for the at-the money call
-#'   (using \code{GBSVolatility} from \code{fOptions})}
-#'   \item {\strong{max_K} (\code{numeric})}{ - highest strike price for out-of-the-money calls}
-#'   \item {\strong{min_K} (\code{numeric})}{ - lowest strike price for out-of-the-money puts}
-#'   \item {\strong{mean_delta_K} (\code{numeric})}{ - average distance between strike prices}
-#'   \item {\strong{n_put} (\code{numeric})}{ - number of out-of-the money puts}
-#'   \item {\strong{n_call} (\code{numeric})}{ - number of out-of-the money calls}
+#'   \item {\strong{SD} (\code{numeric})}- the Black Merton Scholes implied volatility for the at-the money call
+#'   (using \code{GBSVolatility} from \code{fOptions})
+#'   \item {\strong{max_K} (\code{numeric})} - highest strike price for out-of-the-money calls
+#'   \item {\strong{min_K} (\code{numeric})} - lowest strike price for out-of-the-money puts
+#'   \item {\strong{mean_delta_K} (\code{numeric})} - average distance between strike prices
+#'   \item {\strong{n_put} (\code{numeric})} - number of out-of-the money puts
+#'   \item {\strong{n_call} (\code{numeric})} - number of out-of-the money calls
 #' }
 #' @export
 #'

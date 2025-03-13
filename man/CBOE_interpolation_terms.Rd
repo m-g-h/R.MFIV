@@ -26,8 +26,8 @@ Provide either \code{maturity} or \code{date_t} and \code{date_exp}
 This function determines the interpolation terms used for the VIX.
 It provides terms for the two different interpolation techniques used by the CBOE:
 \itemize{
-\item {\strong{2003 VIX} (monthly):} {using monthly options (see the \href{https://web.archive.org/web/20091231021416/https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2009 CBOE Whitepaper})}
-\item {\strong{2014 VIX} (weekly):} {using weekly  options (see the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2019 VIX whitepaper})}
+  \item {\strong{2003 VIX} (monthly):} using monthly options (see the \href{https://web.archive.org/web/20091231021416/https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2009 CBOE Whitepaper})
+  \item {\strong{2014 VIX} (weekly):} using weekly  options (see the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{2019 VIX whitepaper})
 }
 
 Both methods rely on a "near-term" and a "next-term" contract.

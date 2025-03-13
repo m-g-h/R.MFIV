@@ -2,10 +2,9 @@
 #'
 #' See the following vignettes for an explanation of how this package works:
 #'
-#' @docType package
 #' @name R.MFIV
-NULL
-#> NULL
+#' @keywords internal
+"_PACKAGE"
 
 utils::globalVariables(c(".",
                          "Date",
@@ -32,3 +31,7 @@ utils::globalVariables(c(".",
                          "y",
                          "QK")
 )
+
+#' @import mathjaxr
+NULL
+

@@ -4,14 +4,14 @@
 \alias{CBOE_VIX_vars}
 \title{Calculate all variables needed for the calculation of the CBOE VIX}
 \usage{
-CBOE_VIX_vars(option_quotes, R, maturity, ret_vars = F)
+CBOE_VIX_vars(option_quotes, R, maturity, ret_vars = FALSE)
 }
 \arguments{
 \item{option_quotes}{A \code{data.table} or "nest" of option quotes with three columns:
 \itemize{
-\item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
-\item {\strong{c} (\code{numeric})}{ - call option price}
-\item {\strong{p} (\code{numeric})}{ - put option price}
+  \item {\strong{K} (\code{numeric})} - strike price in ascending order
+  \item {\strong{c} (\code{numeric})} - call option price
+  \item {\strong{p} (\code{numeric})} - put option price
 }}
 
 \item{R}{\code{numeric scalar} giving the risk-free rate \mjseqn{R} corresponding to the
@@ -26,18 +26,18 @@ is returned.}
 Returns either a \code{numeric scalar} giving \mjseqn{\sigma^2} or a \code{list} with all variables
 involved in the calculation:
 \itemize{
-\item {\strong{F_0} (\code{numeric})}{ - theoretical at-the money forward \mjseqn{F_0}
-(see \code{\link{CBOE_F_0}})}
-\item {\strong{K_0} (\code{numeric})}{ - theoretical at-the money strike \mjseqn{K_0}
-(see \code{\link{CBOE_K_0}})}
-\item {\strong{n_put_raw} (\code{numeric})}{ - number of put options before option selection
-(see \code{\link{CBOE_option_selection}})}
-\item {\strong{n_call_raw} (\code{numeric})}{ - number of call options before option selection
-(see \code{\link{CBOE_option_selection}})}
-\item {\strong{n_put} (\code{numeric})}{ - number of put options after option selection}
-\item {\strong{n_call} (\code{numeric})}{ - number of call options after option selection}
-\item {\strong{sigma_sq} (\code{numeric})}{ - squared model free implied volatility \mjseqn{\sigma^2}
-(see \code{\link{CBOE_sigma_sq}})}
+  \item {\strong{F_0} (\code{numeric})} - theoretical at-the money forward \mjseqn{F_0}
+   (see \code{\link{CBOE_F_0}})
+  \item {\strong{K_0} (\code{numeric})} - theoretical at-the money strike \mjseqn{K_0}
+   (see \code{\link{CBOE_K_0}})
+  \item {\strong{n_put_raw} (\code{numeric})} - number of put options before option selection
+   (see \code{\link{CBOE_option_selection}})
+  \item {\strong{n_call_raw} (\code{numeric})} - number of call options before option selection
+   (see \code{\link{CBOE_option_selection}})
+  \item {\strong{n_put} (\code{numeric})} - number of put options after option selection
+  \item {\strong{n_call} (\code{numeric})} - number of call options after option selection
+  \item {\strong{sigma_sq} (\code{numeric})} - squared model free implied volatility \mjseqn{\sigma^2
+   (see \code{\link{CBOE_sigma_sq}})}
 }
 }
 \description{

@@ -17,9 +17,8 @@
 #'
 #' @return Returns a \code{data.table} containing the following columns:
 #' \itemize{
-#'   \item{Date (\code{date})}{ - the day of the observation}
-#'   \item{maturity A (\code{numeric}, \emph{decimal})}{ - the CMT rate for the respective maturity in decimal}
-#'   \item{...}
+#'   \item{Date (\code{date})} - the day of the observation
+#'   \item{maturity A (\code{numeric}, \emph{decimal})} - the CMT rate for the respective maturity in decimal
 #' }
 #' @export
 #'
@@ -84,9 +83,9 @@ scrape_cmt_data <- function(url = NULL) {
 #'
 #' @return Returns either a \code{numeric vector} of risk free rates or a \code{data.table} containing:
 #' \itemize{
-#'   \item{\strong{date}(\code{date})}{ - the provided starting dates}
-#'   \item{\strong{exp} (\code{date})}{ - the provided expiration dates}
-#'   \item{\strong{R}   (\code{numeric})}{ - the corresponding risk-free interest rates in \emph{decimal}}
+#'   \item{\strong{date}(\code{date})} - the provided starting dates
+#'   \item{\strong{exp} (\code{date})} - the provided expiration dates
+#'   \item{\strong{R}   (\code{numeric})} - the corresponding risk-free interest rates in \emph{decimal}
 #'}
 #' @export
 #'
@@ -109,7 +108,7 @@ scrape_cmt_data <- function(url = NULL) {
 #' interpolate_rfr(date = dates, exp = exps, ret_table = TRUE)
 #'
 interpolate_rfr <- function(cmt_data = NULL, date, exp,
-                            ret_table = F){
+                            ret_table = FALSE){
   ## USE PPACKAGE DATA IF NONE IS PROVIDED
   if(is.null(cmt_data)){
     cmt <- R.MFIV::cmt_dataset

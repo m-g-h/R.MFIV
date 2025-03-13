@@ -1,4 +1,7 @@
+
 test_that("scrape_cmt_data() works", {
+
+  skip_on_cran()
   ## Download 2019 CMT data
   cmt <- scrape_cmt_data("https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2019/all?type=daily_treasury_yield_curve&field_tdr_date_value=2019&page&_format=csv")
 
@@ -9,7 +12,9 @@ test_that("scrape_cmt_data() works", {
   correct_cmt <- readRDS("correct_cmt")
 
   testthat::expect_equal(cmt, correct_cmt)
+
 })
+
 
 test_that("interpolate_rfr() calculates single values", {
 

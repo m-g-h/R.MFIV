@@ -9,9 +9,9 @@ option_descriptives(option_quotes, K_0, R, price, maturity)
 \arguments{
 \item{option_quotes}{A \code{data.table} or "nest" of option quotes with three columns:
 \itemize{
-\item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
-\item {\strong{c} (\code{numeric})}{ - call option price}
-\item {\strong{p} (\code{numeric})}{ - put option price}
+  \item {\strong{K} (\code{numeric})} - strike price in ascending order
+  \item {\strong{c} (\code{numeric})} - call option price
+  \item {\strong{p} (\code{numeric})} - put option price
 }}
 
 \item{K_0}{\code{numeric scalar}, giving the theoretical at-the-money strike price
@@ -27,13 +27,13 @@ maturity \mjseqn{T} in decimal}
 \value{
 Returns a \code{list} with the following variables:
 \itemize{
-\item {\strong{SD} (\code{numeric})}{- the Black Merton Scholes implied volatility for the at-the money call
-(using \code{GBSVolatility} from \code{fOptions})}
-\item {\strong{max_K} (\code{numeric})}{ - highest strike price for out-of-the-money calls}
-\item {\strong{min_K} (\code{numeric})}{ - lowest strike price for out-of-the-money puts}
-\item {\strong{mean_delta_K} (\code{numeric})}{ - average distance between strike prices}
-\item {\strong{n_put} (\code{numeric})}{ - number of out-of-the money puts}
-\item {\strong{n_call} (\code{numeric})}{ - number of out-of-the money calls}
+  \item {\strong{SD} (\code{numeric})}- the Black Merton Scholes implied volatility for the at-the money call
+  (using \code{GBSVolatility} from \code{fOptions})
+  \item {\strong{max_K} (\code{numeric})} - highest strike price for out-of-the-money calls
+  \item {\strong{min_K} (\code{numeric})} - lowest strike price for out-of-the-money puts
+  \item {\strong{mean_delta_K} (\code{numeric})} - average distance between strike prices
+  \item {\strong{n_put} (\code{numeric})} - number of out-of-the money puts
+  \item {\strong{n_call} (\code{numeric})} - number of out-of-the money calls
 }
 }
 \description{

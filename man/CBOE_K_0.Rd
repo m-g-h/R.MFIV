@@ -11,9 +11,9 @@ CBOE_K_0(option_quotes, F_0)
 \arguments{
 \item{option_quotes}{A \code{data.table} or "nest" of option quotes with three columns:
 \itemize{
-\item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
-\item {\strong{c} (\code{numeric})}{ - call option price}
-\item {\strong{p} (\code{numeric})}{ - put option price}
+  \item {\strong{K} (\code{numeric})} - strike price in ascending order
+  \item {\strong{c} (\code{numeric})} - call option price
+  \item {\strong{p} (\code{numeric})} - put option price
 }}
 
 \item{F_0}{\code{numeric scalar}, giving the  theoretical at-the-money forward \mjseqn{F_0}
@@ -21,7 +21,7 @@ CBOE_K_0(option_quotes, F_0)
 }
 \value{
 Returns a \code{numeric scalar}, giving the theoretical at-the-money
-strike \mjseqn{K_0}
+ strike \mjseqn{K_0}
 }
 \description{
 Following the \href{https://cdn.cboe.com/resources/vix/vixwhite.pdf}{VIX whitepaper}

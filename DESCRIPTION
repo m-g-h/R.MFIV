@@ -1,29 +1,25 @@
 Package: R.MFIV
 Title: Calculate Model Free Implied Volatility, i.e. the CBOE VIX from Option Quotes
-Version: 0.0.1
+Version: 0.1.1
 Authors@R: 
     person(given = "Martin Georg",
            family = "Haas",
-           role = c("aut", "cre"),
+           role = c("aut", "cre", "cph"),
            email = "haasmartin@live.de",
            comment = c(ORCID = "0000-0002-0977-0939"))
-Description: Provides functions to calculate the CBOE VIX, intermediary values 
-    and the Jiang & Tian (2007) smoothing method to deal with an insufficient 
-    strike price range.
+Description: Provides functions to calculate the CBOE VIX, intermediary values and the Jiang & Tian (2007)<doi:doi.org/10.3905/jod.2007.68181310.3905/jod.2007.681813> smoothing method to deal with an insufficient strike price range.
 URL: https://github.com/m-g-h/R.MFIV
 BugReports: https://github.com/m-g-h/R.MFIV/issues
-License: AGPL-3
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+Roxygen: list(markdown = FALSE)
+RoxygenNote: 7.3.2
 Imports:
-    mathjaxr,
     lubridate,
     data.table,
     crayon,
-    rvest,
-    xml2,
+    mathjaxr
 Suggests: 
     testthat (>= 2.1.0),
     covr,
@@ -31,7 +27,8 @@ Suggests:
     dplyr,
     ggplot2,
     plotly,
-    shiny
+    shiny,
+    tidyr
 RdMacros: mathjaxr
 Depends: 
     R (>= 2.10)

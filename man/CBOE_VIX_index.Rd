@@ -13,7 +13,7 @@ CBOE_VIX_index(maturity, sigma_sq)
 
 \item{sigma_sq}{\code{numeric vector of length two} giving the CBOE model-free implied volatility
 of the "near-term" and "next-term" options(\mjseqn{\sigma^2_1} and \mjseqn{\sigma^2_2} respectively).
-Also see \code{\link{CBOE_sigma_sq}}}
+ Also see \code{\link{CBOE_sigma_sq}}}
 }
 \value{
 Returns a \code{numeric scalar} giving the VIX index value

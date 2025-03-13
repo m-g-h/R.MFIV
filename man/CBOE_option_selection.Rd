@@ -9,9 +9,9 @@ CBOE_option_selection(option_quotes, K_0)
 \arguments{
 \item{option_quotes}{A \code{data.table} or "nest" of option quotes with three columns:
 \itemize{
-\item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
-\item {\strong{c} (\code{numeric})}{ - call option price}
-\item {\strong{p} (\code{numeric})}{ - put option price}
+  \item {\strong{K} (\code{numeric})} - strike price in ascending order
+  \item {\strong{c} (\code{numeric})} - call option price
+  \item {\strong{p} (\code{numeric})} - put option price
 }}
 
 \item{K_0}{\code{numeric scalar}, giving the theoretical at-the-money strike price
@@ -20,9 +20,9 @@ CBOE_option_selection(option_quotes, K_0)
 \value{
 Returns a \code{data.table} with three columns:
 \itemize{
-\item {\strong{K} (\code{numeric})}{ - strike price in ascending order}
-\item {\strong{c} (\code{numeric})}{ - call option price}
-\item {\strong{p} (\code{numeric})}{ - put option price}
+  \item {\strong{K} (\code{numeric})} - strike price in ascending order
+  \item {\strong{c} (\code{numeric})} - call option price
+  \item {\strong{p} (\code{numeric})} - put option price
 } which is filtered according to the CBOE rules
 }
 \description{

@@ -18,9 +18,9 @@ calculates \mjseqn{\Delta K_i} as \emph{"half the difference between the strike 
 \mjseqn{K_i}"}:
 \loadmathjax
 \mjsdeqn{\Delta K_i := \begin{cases} K_1 - K_0 \qquad \; \; if \; i = 0 \\\\\
-K_N - K_{N-1} \; \; \; if \; i = N \\\\\
-\frac{K_{i+1} - K_{i-1}}{2} \qquad \; else
-\end{cases}}
+                                     K_N - K_{N-1} \; \; \; if \; i = N \\\\\
+                                     \frac{K_{i+1} - K_{i-1}}{2} \qquad \; else
+                       \end{cases}}
 }
 \examples{
 

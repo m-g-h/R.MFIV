@@ -58,7 +58,7 @@ test_that("CBOE_option_selection() works", {
                              rev = T)
 
   ## CROSS THE TEST VECTORS
-  crossed_NA <- purrr::cross2(calls_NA, puts_NA)
+  crossed_NA <- tidyr::expand_grid(calls_NA, puts_NA)
 
   df_NA <- purrr::map2_dfr(crossed_NA, 1:length(crossed_NA),
                            .f = ~data.table::data.table(index = .y,
@@ -69,7 +69,7 @@ test_that("CBOE_option_selection() works", {
                    by = index]
 
   ## CROSS THE CORRECT VECTORS
-  cor_crossed_NA <- purrr::cross2(cor_calls_NA, cor_puts_NA)
+  cor_crossed_NA <- tidyr::expand_grid(cor_calls_NA, cor_puts_NA)
 
   cor_df_NA <- purrr::map2_dfr(cor_crossed_NA, 1:length(cor_crossed_NA),
                                .f = ~data.table::data.table(index = .y,

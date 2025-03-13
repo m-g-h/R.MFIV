@@ -7,19 +7,19 @@
 \format{
 A \code{data.table} with the following columns:
 \itemize{
-\item{\strong{Date}   (\code{date})}{ - the day of the quoted CMT rates}
-\item{\strong{X1.mo}  (\code{numeric})}{ - \emph{decimal} one month CMT rate}
-\item{\strong{X2.mo}  (\code{numeric})}{ - \emph{decimal} two month CMT rate}
-\item{\strong{X3.mo}  (\code{numeric})}{ - \emph{decimal} three month CMT rate}
-\item{\strong{X6.mo}  (\code{numeric})}{ - \emph{decimal} six month CMT rate}
-\item{\strong{X1.yr}  (\code{numeric})}{ - \emph{decimal} one year CMT rate}
-\item{\strong{X2.yr}  (\code{numeric})}{ - \emph{decimal} two year CMT rate}
-\item{\strong{X3.yr}  (\code{numeric})}{ - \emph{decimal} three year CMT rate}
-\item{\strong{X5.yr}  (\code{numeric})}{ - \emph{decimal} five year CMT rate}
-\item{\strong{X7.yr}  (\code{numeric})}{ - \emph{decimal} seven year CMT rate}
-\item{\strong{X10.yr} (\code{numeric})}{ - \emph{decimal} ten year CMT rate}
-\item{\strong{X20.yr} (\code{numeric})}{ - \emph{decimal} twenty year CMT rate}
-\item{\strong{X30.yr} (\code{numeric})}{ - \emph{decimal} thirty year CMT rate}
+  \item{\strong{Date}   (\code{date})} - the day of the quoted CMT rates
+  \item{\strong{X1.mo}  (\code{numeric})} - \emph{decimal} one month CMT rate
+  \item{\strong{X2.mo}  (\code{numeric})} - \emph{decimal} two month CMT rate
+  \item{\strong{X3.mo}  (\code{numeric})} - \emph{decimal} three month CMT rate
+  \item{\strong{X6.mo}  (\code{numeric})} - \emph{decimal} six month CMT rate
+  \item{\strong{X1.yr}  (\code{numeric})} - \emph{decimal} one year CMT rate
+  \item{\strong{X2.yr}  (\code{numeric})} - \emph{decimal} two year CMT rate
+  \item{\strong{X3.yr}  (\code{numeric})} - \emph{decimal} three year CMT rate
+  \item{\strong{X5.yr}  (\code{numeric})} - \emph{decimal} five year CMT rate
+  \item{\strong{X7.yr}  (\code{numeric})} - \emph{decimal} seven year CMT rate
+  \item{\strong{X10.yr} (\code{numeric})} - \emph{decimal} ten year CMT rate
+  \item{\strong{X20.yr} (\code{numeric})} - \emph{decimal} twenty year CMT rate
+  \item{\strong{X30.yr} (\code{numeric})} - \emph{decimal} thirty year CMT rate
 }
 }
 \source{
